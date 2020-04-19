@@ -2,7 +2,7 @@ package main.gui;
 
 import javax.swing.*;
 import java.awt.*;
-
+//Example GUI class that will be expanded upon with additional classes
 public class Deliverables extends JFrame {
 
     public Deliverables() {
