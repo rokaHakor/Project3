@@ -10,5 +10,7 @@ public class Deliverables extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize((int)(screenSize.width*.8), (int)(screenSize.height*.8));
+        setContentPane(new Deliverables2().panel);
+        pack();
     }
 }
