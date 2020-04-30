@@ -18,4 +18,9 @@ public class TaskForm {
     private JButton noneButton;
     private JButton cancelButton;
     private JButton saveButton;
+    private JButton resource1Button;
+    private JButton resource2Button;
+    private JButton resource3Button;
+    private JButton task1Button;
+    private JButton task2Button;
 }

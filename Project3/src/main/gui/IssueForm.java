@@ -10,4 +10,6 @@ public class IssueForm {
     private JComboBox comboBox2;
     private JButton a10May2019Button;
     private JButton a8May2019Button;
+    private JButton cancelButton;
+    private JButton saveButton;
 }
