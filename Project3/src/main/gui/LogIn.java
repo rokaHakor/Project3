@@ -11,15 +11,15 @@ public class LogIn {
     private JPasswordField passwordField1;
     private JButton forgotPasswordButton;
 
-    public LogIn(JFrame frame){
+    public LogIn(JFrame frame) {
 
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().remove(frame.getContentPane());
                 frame.setContentPane(new ProjectGUI().panel1);
+                frame.revalidate();
                 frame.repaint();
-                frame.pack();
             }
         });
     }

@@ -6,6 +6,7 @@ import java.awt.*;
 public class MainFrame extends JFrame {
 
     public MainFrame() {
+
         setTitle("Project Management System");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
