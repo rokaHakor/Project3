@@ -8,21 +8,38 @@ import java.awt.event.ActionListener;
 public class ProjectGUI {
     public JPanel panel1;
     private JButton addActionItem;
-    private JButton actionItem1Button;
     private JButton addResource;
-    private JButton jamesLordButton;
     private JButton addDeliverable;
     private JButton addTask;
     private JButton addIssue;
     private JPanel deliverablesPanel;
+    private JPanel tasksPanel;
+    private JPanel issuesPanel;
+    private JPanel actionItemsPanel;
+    private JPanel resourcesPanel;
+    private JRadioButton ganttChart;
 
     public ProjectGUI() {
         deliverablesPanel.setLayout(new BoxLayout(deliverablesPanel, BoxLayout.Y_AXIS));
         deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        JButton button = new JButton("Button1");
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        deliverablesPanel.add(button);
-        deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        tasksPanel.setLayout(new BoxLayout(tasksPanel, BoxLayout.Y_AXIS));
+        tasksPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        issuesPanel.setLayout(new BoxLayout(issuesPanel, BoxLayout.Y_AXIS));
+        issuesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        actionItemsPanel.setLayout(new BoxLayout(actionItemsPanel, BoxLayout.Y_AXIS));
+        actionItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
+        resourcesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        addDeliverables();
+        addTasks();
+        addIssues();
+        addActionItems();
+        addResources();
 
 
         addDeliverable.addActionListener(new ActionListener() {
@@ -80,6 +97,12 @@ public class ProjectGUI {
                 resourceForm.setVisible(true);
             }
         });
+        ganttChart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 
     private void addDeliverables() {
@@ -88,8 +111,67 @@ public class ProjectGUI {
             JButton button = new JButton("Button" + x);
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
             deliverablesPanel.add(button);
-            
             deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+    }
+
+    private void addTasks() {
+        for (int x = 1; x <= 10; x++) {
+            tasksPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            JButton button = new JButton("Button" + x);
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            tasksPanel.add(button);
+            JProgressBar bar = new JProgressBar(0, 100);
+            bar.setValue(30);
+            bar.setString(30 + "%");
+            bar.setStringPainted(true);
+            tasksPanel.add(bar);
+            tasksPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+    }
+
+    private void addIssues() {
+        for (int x = 1; x <= 10; x++) {
+            issuesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            JButton button = new JButton("Button" + x);
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            issuesPanel.add(button);
+            JPanel statusPanel = new JPanel();
+            statusPanel.setLayout(new BorderLayout());
+            statusPanel.add(new JLabel("<html>Priority<br/>Low</html>"), BorderLayout.WEST);
+            statusPanel.add(new JLabel("<html>Status<br/>Low</html>", SwingConstants.CENTER), BorderLayout.CENTER);
+            statusPanel.add(new JLabel("<html>Severity<br/>Low</html>"), BorderLayout.EAST);
+            issuesPanel.add(statusPanel);
+            issuesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+    }
+
+    private void addActionItems() {
+        for (int x = 1; x <= 10; x++) {
+            actionItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            JPanel statusPanel = new JPanel();
+            statusPanel.setLayout(new BorderLayout());
+            JButton button = new JButton("Button" + x);
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            statusPanel.add(button, BorderLayout.NORTH);
+            statusPanel.add(new JLabel("Status: On Hold"), BorderLayout.CENTER);
+            actionItemsPanel.add(statusPanel);
+            actionItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+    }
+
+    private void addResources() {
+        for (int x = 1; x <= 10; x++) {
+            resourcesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            JPanel statusPanel = new JPanel();
+            statusPanel.setLayout(new BorderLayout());
+            JButton button = new JButton("Button " + x);
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            statusPanel.add(button, BorderLayout.NORTH);
+            statusPanel.add(new JLabel("8AM-5PM", SwingConstants.CENTER), BorderLayout.CENTER);
+            statusPanel.add(new JLabel("M-W-F", SwingConstants.CENTER), BorderLayout.SOUTH);
+            resourcesPanel.add(statusPanel);
+            resourcesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         }
     }
 }
