@@ -31,4 +31,27 @@ public class ProjectForm {
             }
         });
     }
+
+    public ProjectForm(JFrame frame, JFrame otherFrame) {
+        mainFrame = frame;
+
+        createButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                otherFrame.getContentPane().remove(otherFrame.getContentPane());
+                ProjectGUI proj = new ProjectGUI();
+                proj.setProjectName(nameText.getText());
+                otherFrame.setContentPane(proj.panel1);
+                otherFrame.revalidate();
+                otherFrame.repaint();
+                mainFrame.dispose();
+            }
+        });
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainFrame.dispose();
+            }
+        });
+    }
 }

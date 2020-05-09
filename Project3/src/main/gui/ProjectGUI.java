@@ -18,6 +18,7 @@ public class ProjectGUI {
     private JPanel actionItemsPanel;
     private JPanel resourcesPanel;
     private JRadioButton ganttChart;
+    private JLabel projectName;
 
     public ProjectGUI() {
         deliverablesPanel.setLayout(new BoxLayout(deliverablesPanel, BoxLayout.Y_AXIS));
@@ -105,7 +106,11 @@ public class ProjectGUI {
         });
     }
 
-    public void refreshPanels(){
+    public void setProjectName(String name) {
+        projectName.setText(name);
+    }
+
+    public void refreshPanels() {
 
     }
 

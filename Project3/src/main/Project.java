@@ -70,9 +70,9 @@ public class Project {
     }
 
     int getProjectID() {return projectID;}
-    String getName() {return name;}
-    String getDescription() {return description;}
-    String getUrl() {return url;}
+    public String getName() {return name;}
+    public String getDescription() {return description;}
+    public String getUrl() {return url;}
     public void setName(String name) {this.name = name;}
     public void setDescription(String description) {this.description = description;}
 

@@ -14,7 +14,7 @@ public class ProjectsPage {
     private JPanel centerPanel;
     private JPanel rightPanel;
 
-    public ProjectsPage() {
+    public ProjectsPage(JFrame frame) {
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
@@ -48,30 +48,24 @@ public class ProjectsPage {
         int x = 0;
         for (Project p : User.getProjectVector()) {
             if (x % 3 == 0) {
-                JPanel panelCenter = new JPanel(new FlowLayout());
-                JButton button = new JButton("Create Project");
-                button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), 24));
-                button.setAlignmentX(Component.CENTER_ALIGNMENT);
-                panelCenter.add(button);
-                centerPanel.add(panelCenter);
+                createProjectButton(p, centerPanel);
             }
             if (x % 3 == 1) {
-                JPanel panelRight = new JPanel(new FlowLayout());
-                JButton button = new JButton("Create Project");
-                button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), 24));
-                button.setAlignmentX(Component.CENTER_ALIGNMENT);
-                panelRight.add(button);
-                rightPanel.add(panelRight);
+                createProjectButton(p, rightPanel);
             }
             if (x % 3 == 2) {
-                JPanel panelLeft = new JPanel(new FlowLayout());
-                JButton button = new JButton("Create Project");
-                button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), 24));
-                button.setAlignmentX(Component.CENTER_ALIGNMENT);
-                panelLeft.add(button);
-                leftPanel.add(panelLeft);
+                createProjectButton(p, leftPanel);
             }
             x++;
         }
+    }
+
+    private void createProjectButton(Project p, JPanel panel) {
+        JPanel panelRight = new JPanel(new FlowLayout());
+        JButton button = new JButton(p.getName());
+        button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), 24));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelRight.add(button);
+        panel.add(panelRight);
     }
 }
