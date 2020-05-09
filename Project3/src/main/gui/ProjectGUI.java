@@ -266,6 +266,7 @@ public class ProjectGUI {
             statusPanel.add(new JLabel("<html>Priority<br/>" + i.getPriority() + "</html>"), BorderLayout.WEST);
             statusPanel.add(new JLabel("<html>Status<br/>" + i.getStatus() + "</html>", SwingConstants.CENTER), BorderLayout.CENTER);
             statusPanel.add(new JLabel("<html>Severity<br/>" + i.getSeverity() + "</html>"), BorderLayout.EAST);
+            statusPanel.setMaximumSize(new Dimension(200,50));
             issuesPanel.add(statusPanel);
             issuesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             button.addActionListener(new ActionListener() {
@@ -292,6 +293,7 @@ public class ProjectGUI {
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
             statusPanel.add(button, BorderLayout.NORTH);
             statusPanel.add(new JLabel("Status: " + a.getStatus()), BorderLayout.CENTER);
+            statusPanel.setMaximumSize(new Dimension(200,50));
             actionItemsPanel.add(statusPanel);
             actionItemsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             button.addActionListener(new ActionListener() {
@@ -319,6 +321,7 @@ public class ProjectGUI {
             statusPanel.add(button, BorderLayout.NORTH);
             statusPanel.add(new JLabel("8AM-5PM", SwingConstants.CENTER), BorderLayout.CENTER);
             statusPanel.add(new JLabel("M-W-F", SwingConstants.CENTER), BorderLayout.SOUTH);
+            statusPanel.setMaximumSize(new Dimension(200,60));
             resourcesPanel.add(statusPanel);
             resourcesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             button.addActionListener(new ActionListener() {
