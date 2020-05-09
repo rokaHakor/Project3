@@ -37,7 +37,7 @@ public class ProjectsPage {
                 JFrame projectForm = new JFrame();
                 projectForm.setTitle("Project Form");
                 projectForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                projectForm.setContentPane(new ProjectForm(projectForm).panel1);
+                projectForm.setContentPane(new ProjectForm(projectForm, frame).panel1);
                 projectForm.pack();
                 projectForm.setVisible(true);
             }

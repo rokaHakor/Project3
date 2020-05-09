@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class Issue {
 
-    int issueID, priority, severity, status;
-    String uniqueID, name, description, statusDescription;
+    int issueID;
+    String uniqueID, name, description, statusDescription, priority, severity, status;
     Date dateRaised, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate;
 
     public Issue() {}
 
-    public Issue(int issueID, int priority, int severity, int status, String name, String description,
+    public Issue(int issueID, String priority, String severity, String status, String name, String description,
                  String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate,
                  Date actualCompletionDate, Date updateDate) {
 
@@ -35,12 +35,12 @@ public class Issue {
         this.issueID = issueID;
         uniqueID = "I" + issueID;
     }
-    public int getPriority() { return priority; }
-    public void setPriority(int priority) { this.priority = priority; }
-    public int getSeverity() { return severity; }
-    public void setSeverity(int severity) { this.severity = severity; }
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+    public String getSeverity() { return severity; }
+    public void setSeverity(String severity) { this.severity = severity; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getDescription() { return description; }
@@ -58,7 +58,7 @@ public class Issue {
     public Date getUpdateDate() { return updateDate; }
     public void setUpdateDate(Date updateDate) { this.updateDate = updateDate; }
 
-    public void updateIssue(int priority, int severity, int status, String name, String description,
+    public void updateIssue(String priority, String severity, String status, String name, String description,
                             String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
                             Date updateDate) {
 

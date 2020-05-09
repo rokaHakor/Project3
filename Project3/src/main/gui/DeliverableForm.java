@@ -30,7 +30,7 @@ public class DeliverableForm {
     private JPanel datePanel;
     private JDatePicker dueDatePicker;
 
-    public DeliverableForm(JFrame frame) {
+    public DeliverableForm(JFrame frame, ProjectGUI gui) {
         mainFrame = frame;
 
         dueDatePicker = new JDateComponentFactory().createJDatePicker();
@@ -46,6 +46,8 @@ public class DeliverableForm {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Date dueDate = Utils.getDateFromPicker(dueDatePicker);
+                gui.setAddDeliverable(deliverableNameText.getText(), descText.getText(), dueDate);
+                gui.refreshPanels();
                 mainFrame.dispose();
             }
         });
@@ -74,7 +76,7 @@ public class DeliverableForm {
 
         datePanel.add((JComponent) dueDatePicker);
 
-        if(!editable){
+        if (!editable) {
             deliverableNameText.setEditable(false);
             descText.setEditable(false);
             saveButton.setText("Edit");
@@ -84,7 +86,7 @@ public class DeliverableForm {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(editable) {
+                if (editable) {
                     Date dueDate = Utils.getDateFromPicker(dueDatePicker);
                     mainFrame.dispose();
                 } else {

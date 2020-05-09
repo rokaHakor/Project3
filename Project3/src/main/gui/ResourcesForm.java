@@ -9,6 +9,7 @@ import java.util.EnumSet;
 
 public class ResourcesForm {
     public JPanel panel1;
+    private boolean editable;
     private JFrame mainFrame;
     private JTextField resourceNameTextField;
     private JTextField titleText;
@@ -24,11 +25,13 @@ public class ResourcesForm {
     private JButton cancelButton;
     private JButton saveButton;
 
-    public ResourcesForm(JFrame frame) {
+    public ResourcesForm(JFrame frame, ProjectGUI gui) {
         mainFrame = frame;
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                gui.setAddResource(resourceNameTextField.getText(), titleText.getText(), skillsText.getText(), Float.parseFloat(wageText.getText()));
+                gui.refreshPanels();
                 mainFrame.dispose();
             }
         });
@@ -42,6 +45,8 @@ public class ResourcesForm {
 
     public ResourcesForm(JFrame frame, boolean edit, String name, String title, String skills, int from, int to, EnumSet<Days> availability, float wage) {
         mainFrame = frame;
+        editable = edit;
+
         resourceNameTextField.setText(name);
         titleText.setText(title);
         skillsText.setText(skills);
@@ -54,13 +59,13 @@ public class ResourcesForm {
         thursdayCheckBox.setSelected(availability.contains(Days.THURSDAY));
         fridayCheckBox.setSelected(availability.contains(Days.FRIDAY));
 
-        if (!edit) {
-            resourceNameTextField.setEnabled(false);
-            titleText.setEnabled(false);
-            skillsText.setEnabled(false);
-            fromTime.setEnabled(false);
-            toTime.setEnabled(false);
-            wageText.setEnabled(false);
+        if (!editable) {
+            resourceNameTextField.setEditable(false);
+            titleText.setEditable(false);
+            skillsText.setEditable(false);
+            fromTime.setEditable(false);
+            toTime.setEditable(false);
+            wageText.setEditable(false);
             mondayCheckBox.setEnabled(false);
             tuesdayCheckBox.setEnabled(false);
             wednesdayCheckBox.setEnabled(false);
@@ -73,7 +78,23 @@ public class ResourcesForm {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainFrame.dispose();
+                if (editable) {
+                    mainFrame.dispose();
+                } else {
+                    editable = true;
+                    resourceNameTextField.setEditable(true);
+                    titleText.setEditable(true);
+                    skillsText.setEditable(true);
+                    fromTime.setEditable(true);
+                    toTime.setEditable(true);
+                    wageText.setEditable(true);
+                    mondayCheckBox.setEnabled(true);
+                    tuesdayCheckBox.setEnabled(true);
+                    wednesdayCheckBox.setEnabled(true);
+                    thursdayCheckBox.setEnabled(true);
+                    fridayCheckBox.setEnabled(true);
+                    saveButton.setText("Save");
+                }
             }
         });
         cancelButton.addActionListener(new ActionListener() {

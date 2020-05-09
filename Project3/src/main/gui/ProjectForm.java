@@ -39,7 +39,7 @@ public class ProjectForm {
             @Override
             public void actionPerformed(ActionEvent e) {
                 otherFrame.getContentPane().remove(otherFrame.getContentPane());
-                ProjectGUI proj = new ProjectGUI();
+                ProjectGUI proj = new ProjectGUI(otherFrame);
                 proj.setProjectName(nameText.getText());
                 otherFrame.setContentPane(proj.panel1);
                 otherFrame.revalidate();

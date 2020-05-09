@@ -709,7 +709,7 @@ public class Project {
     }
 
     /*********************************************** ISSUE ************************************************************/
-    public void createIssueButtonClicked(int priority, int severity, int status, String name, String description,
+    public void createIssueButtonClicked(String priority, String severity, String status, String name, String description,
                                          String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
                                          Date updateDate, Vector<Integer> actionItemIDsVector, Vector<Integer> decisionIDsVector) {
 
@@ -725,7 +725,7 @@ public class Project {
         updateActionItemAndDecisionAssociations(issue, actionItemIDsVector, decisionIDsVector);
     }
 
-    public void updateIssueButtonClicked(Issue issue, int priority, int severity, int status, String name,
+    public void updateIssueButtonClicked(Issue issue, String priority, String severity, String status, String name,
                                          String description, String statusDescription, Date dateRaised,
                                          Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
                                          Date updateDate, Vector<Integer> actionItemIDsVector,
@@ -820,7 +820,7 @@ public class Project {
         return decisionIDsVector;
     }
 
-    public void insertIssueInDB(int priority, int severity, int status, String name, String description,
+    public void insertIssueInDB(String priority, String severity, String status, String name, String description,
                                 String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
                                 Date updateDate) {
 
@@ -832,13 +832,13 @@ public class Project {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
             pstmt.setString(2, description);
-            pstmt.setInt(3, priority);
-            pstmt.setInt(4, severity);
+            pstmt.setString(3, priority);
+            pstmt.setString(4, severity);
             pstmt.setLong(5, User.convertDateToLong(dateRaised));
             pstmt.setLong(6, User.convertDateToLong(dateAssigned));
             pstmt.setLong(7, User.convertDateToLong(expectedCompletionDate));
             pstmt.setLong(8, User.convertDateToLong(actualCompletionDate));
-            pstmt.setInt(9, status);
+            pstmt.setString(9, status);
             pstmt.setString(10, statusDescription);
             pstmt.setLong(11, User.convertDateToLong(updateDate));
             pstmt.executeUpdate();
@@ -848,7 +848,7 @@ public class Project {
         Connect.closeConnection(conn);
     }
 
-    public void updateIssueInDB(int issueID, int priority, int severity, int status, String name, String description,
+    public void updateIssueInDB(int issueID, String priority, String severity, String status, String name, String description,
                                 String statusDescription, Date dateRaised, Date dateAssigned,
                                 Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
 
@@ -861,13 +861,13 @@ public class Project {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
             pstmt.setString(2, description);
-            pstmt.setInt(3, priority);
-            pstmt.setInt(4, severity);
+            pstmt.setString(3, priority);
+            pstmt.setString(4, severity);
             pstmt.setLong(5, User.convertDateToLong(dateRaised));
             pstmt.setLong(6, User.convertDateToLong(dateAssigned));
             pstmt.setLong(7, User.convertDateToLong(expectedCompletionDate));
             pstmt.setLong(8, User.convertDateToLong(actualCompletionDate));
-            pstmt.setInt(9, status);
+            pstmt.setString(9, status);
             pstmt.setString(10, statusDescription);
             pstmt.setLong(11, User.convertDateToLong(updateDate));
             pstmt.setInt(15, issueID);
@@ -894,13 +894,13 @@ public class Project {
                 issue.setIssueID(rs.getInt("IssueID"));
                 issue.setName(rs.getString("Name"));
                 issue.setDescription(rs.getString("Description"));
-                issue.setPriority(rs.getInt("Priority"));
-                issue.setSeverity(rs.getInt("Severity"));
+                issue.setPriority(rs.getString("Priority"));
+                issue.setSeverity(rs.getString("Severity"));
                 issue.setDateRaised(User.convertLongToDate(rs.getLong("Date_Raised")));
                 issue.setDateAssigned(User.convertLongToDate(rs.getLong("Date_Assigned")));
                 issue.setExpectedCompletionDate(User.convertLongToDate(rs.getLong("Expected_Completion_Date")));
                 issue.setActualCompletionDate(User.convertLongToDate(rs.getLong("Actual_Completion_Date")));
-                issue.setStatus(rs.getInt("Status"));
+                issue.setStatus(rs.getString("Status"));
                 issue.setStatusDescription(rs.getString("Status_Description"));
                 issue.setUpdateDate(User.convertLongToDate(rs.getLong("Update_Date")));
                 issueVector.add(issue);
@@ -922,7 +922,7 @@ public class Project {
         return ret;
     }
 
-    public void createActionItemButtonClicked(int resourceID, int status, String name, String description,
+    public void createActionItemButtonClicked(int resourceID, String status, String name, String description,
                                               String statusDescription, String statusDefaults, Date dateCreated,
                                               Date dateAssigned, Date expectedCompletionDate,
                                               Date actualCompletionDate, Date updateDate) {
@@ -937,7 +937,7 @@ public class Project {
         actionItemVector.add(actionItem);
     }
 
-    public void updateActionItemButtonClicked(ActionItem actionItem, int resourceID, int status, String name, String description,
+    public void updateActionItemButtonClicked(ActionItem actionItem, int resourceID, String status, String name, String description,
                                               String statusDescription, String statusDefaults, Date dateCreated,
                                               Date dateAssigned, Date expectedCompletionDate,
                                               Date actualCompletionDate, Date updateDate) {
@@ -956,7 +956,7 @@ public class Project {
         actionItemVector.remove(actionItem);
     }
 
-    public void insertActionItemInDB(int resourceID, int status, String name, String description,
+    public void insertActionItemInDB(int resourceID, String status, String name, String description,
                                      String statusDescription, java.util.Date dateCreated,
                                      java.util.Date dateAssigned, java.util.Date expectedCompletionDate,
                                      java.util.Date actualCompletionDate, java.util.Date updateDate) {
@@ -974,7 +974,7 @@ public class Project {
             pstmt.setLong(5, User.convertDateToLong(dateAssigned));
             pstmt.setLong(6, User.convertDateToLong(expectedCompletionDate));
             pstmt.setLong(7, User.convertDateToLong(actualCompletionDate));
-            pstmt.setInt(8, status);
+            pstmt.setString(8, status);
             pstmt.setString(9, statusDescription);
             pstmt.setLong(10, User.convertDateToLong(updateDate));
             pstmt.executeUpdate();
@@ -1007,7 +1007,7 @@ public class Project {
                 actionItem.setDateAssigned(User.convertLongToDate(rs.getLong("Date_Assigned")));
                 actionItem.setExpectedCompletionDate(User.convertLongToDate(rs.getLong("Expected_Completion_Date")));
                 actionItem.setActualCompletionDate(User.convertLongToDate(rs.getLong("Actual_Completion_Date")));
-                actionItem.setStatus(rs.getInt("Status"));
+                actionItem.setStatus(rs.getString("Status"));
                 actionItem.setStatusDescription(rs.getString("Status_Description"));
                 actionItem.setUpdateDate(User.convertLongToDate(rs.getLong("Update_Date")));
                 actionItemVector.add(actionItem);
@@ -1018,7 +1018,7 @@ public class Project {
         Connect.closeConnection(conn);
     }
 
-    public void updateActionItemInProject(ActionItem actionItem, int resourceID, int status, String name, String description,
+    public void updateActionItemInProject(ActionItem actionItem, int resourceID, String status, String name, String description,
                                           String statusDescription, Date dateCreated,
                                           Date dateAssigned, Date expectedCompletionDate,
                                           Date actualCompletionDate, Date updateDate) {
@@ -1034,7 +1034,7 @@ public class Project {
         actionItem.setUpdateDate(updateDate);
     }
 
-    public void updateActionItemInDB(int actionItemID, int resourceID, int status, String name, String description,
+    public void updateActionItemInDB(int actionItemID, int resourceID, String status, String name, String description,
                                      String statusDescription, Date dateCreated, Date dateAssigned,
                                      Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
 
@@ -1050,7 +1050,7 @@ public class Project {
             pstmt.setLong(5, User.convertDateToLong(dateAssigned));
             pstmt.setLong(6, User.convertDateToLong(expectedCompletionDate));
             pstmt.setLong(7, User.convertDateToLong(actualCompletionDate));
-            pstmt.setInt(8, status);
+            pstmt.setString(8, status);
             pstmt.setString(9, statusDescription);
             pstmt.setLong(10, User.convertDateToLong(updateDate));
             pstmt.setInt(11, actionItemID);

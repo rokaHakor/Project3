@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class ActionItem {
 
-    int actionItemID, issueID, riskID, resourceID, status;
-    String uniqueID, name, description, statusDescription;
+    int actionItemID, issueID, riskID, resourceID;
+    String uniqueID, name, description, statusDescription, status;
     Date dateCreated, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate;
 
     public ActionItem() {}
 
-    public ActionItem(int actionItemID, int issueID, int riskID, int resourceID, int status, String name,
+    public ActionItem(int actionItemID, int issueID, int riskID, int resourceID, String status, String name,
                       String description, String statusDescription, Date dateCreated, Date dateAssigned,
                       Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
 
@@ -42,8 +42,8 @@ public class ActionItem {
     public void setRiskID(int riskID) { this.riskID = riskID; }
     public int getResourceID() { return resourceID; }
     public void setResourceID(int resourceID) { this.resourceID = resourceID; }
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getDescription() { return description; }

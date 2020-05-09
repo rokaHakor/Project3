@@ -42,7 +42,7 @@ public class TaskForm {
     private JDatePicker actStartPicker;
     private JDatePicker actEndPicker;
 
-    public TaskForm(JFrame frame) {
+    public TaskForm(JFrame frame, ProjectGUI gui) {
         mainFrame = frame;
 
         expStartPicker = new JDateComponentFactory().createJDatePicker();
@@ -85,6 +85,8 @@ public class TaskForm {
                 Date expectedEnd = Utils.getDateFromPicker(expStartPicker);
                 Date actualStart = Utils.getDateFromPicker(actStartPicker);
                 Date actualEnd = Utils.getDateFromPicker(actEndPicker);
+                gui.setAddTask(taskNameText.getText(), descText.getText(), expectedStart,expectedEnd, actualStart, actualEnd);
+                gui.refreshPanels();
                 mainFrame.dispose();
             }
         });

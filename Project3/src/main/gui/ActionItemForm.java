@@ -34,7 +34,7 @@ public class ActionItemForm implements HasComboBoxes{
     private JDatePicker actualDatePicker;
 
 
-    public ActionItemForm(JFrame frame) {
+    public ActionItemForm(JFrame frame, ProjectGUI gui) {
         mainFrame = frame;
 
         expectedDatePicker = new JDateComponentFactory().createJDatePicker();
@@ -64,6 +64,8 @@ public class ActionItemForm implements HasComboBoxes{
             public void actionPerformed(ActionEvent e) {
                 Date expectedDate = Utils.getDateFromPicker(expectedDatePicker);
                 Date actualDate = Utils.getDateFromPicker(actualDatePicker);
+                gui.setAddActionItem(actionItemNameText.getText(), descText.getText(),statusCombo.getSelectedItem(), new Date(),expectedDate, actualDate, new Date());
+                gui.refreshPanels();
                 mainFrame.dispose();
             }
         });

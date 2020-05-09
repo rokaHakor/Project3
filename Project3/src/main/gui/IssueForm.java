@@ -33,7 +33,7 @@ public class IssueForm implements HasComboBoxes {
     private JDatePicker assignedDatePicker;
 
 
-    public IssueForm(JFrame frame) {
+    public IssueForm(JFrame frame, ProjectGUI gui) {
         mainFrame = frame;
 
         //TODO medthod to get defaults and fill comboboxes
@@ -64,7 +64,9 @@ public class IssueForm implements HasComboBoxes {
             public void actionPerformed(ActionEvent e) {
                 Date raisedDate = Utils.getDateFromPicker(raisedDatePicker);
                 Date assignedDate = Utils.getDateFromPicker(assignedDatePicker);
-                //TODO input values into DB
+                gui.setAddIssue(issueNameText.getText(), descText.getText(), raisedDate,assignedDate, statusCombo.getSelectedItem(),priorityCombo.getSelectedItem(),
+        severityCombo.getSelectedItem());
+                gui.refreshPanels();
                 mainFrame.dispose();
             }
         });
