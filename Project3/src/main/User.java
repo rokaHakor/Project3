@@ -74,6 +74,7 @@ public class User {
                 User.projectVector = loadAllProjectsFromDB(getUserID(username));        //Needed to pass all projects to the Projects page
                 User.userID = getUserID(username);
                 //Todo: Open the Projects page for this user using the information in the loop above
+                return "Good";
             } else {
                 return "Password does not match Username";     //Todo: Change to pop-out window
             }
@@ -371,4 +372,7 @@ public class User {
     }
 
 
+    public static int getUserID() {
+        return userID;
+    }
 }

@@ -20,7 +20,7 @@ public class ProjectForm {
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                User.createNewProjectButtonClicked(1, nameText.getText(), descText.getText());
+                User.createNewProjectButtonClicked(User.getUserID(), nameText.getText(), descText.getText());
                 mainFrame.dispose();
             }
         });
