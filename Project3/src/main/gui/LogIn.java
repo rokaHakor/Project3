@@ -1,7 +1,5 @@
 package main.gui;
 
-import main.User;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,16 +19,17 @@ public class LogIn {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String value = User.loginButtonClicked(userText.getText(), String.valueOf(passwordField1.getPassword()));
+                frame.getContentPane().remove(frame.getContentPane());
+                frame.setContentPane(new ProjectsPage(frame).panel1);
+                frame.revalidate();
+                frame.repaint();
+                /*String value = User.loginButtonClicked(userText.getText(), String.valueOf(passwordField1.getPassword()));
                 if (value.equals("Good")) {
-                    frame.getContentPane().remove(frame.getContentPane());
-                    frame.setContentPane(new ProjectsPage(frame).panel1);
-                    frame.revalidate();
-                    frame.repaint();
+
                 } else {
                     errorLabel.setText(value);
                     errorLabel.setVisible(true);
-                }
+                }*/
             }
         });
         createAccountButton.addActionListener(new ActionListener() {

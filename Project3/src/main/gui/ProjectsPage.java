@@ -29,7 +29,7 @@ public class ProjectsPage {
         panel.add(createProject, BorderLayout.NORTH);
         leftPanel.add(panel);
 
-        displayProjects();
+        //displayProjects();
 
         createProject.addActionListener(new ActionListener() {
             @Override
