@@ -38,44 +38,51 @@ public static Date convertLongToDate(long dateLong)
 
 package main;
 
-import java.sql.*;
-import java.util.Vector;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.Vector;
 
 public class User {
 
     private static Vector<Project> projectVector;
 
-    public static Vector<Project> getProjectVector() { return projectVector; }
+    public static Vector<Project> getProjectVector() {
+        return projectVector;
+    }
+
     public static void setProjectVector(Vector<Project> projectVector) {
         User.projectVector = projectVector;
     }
 
     public static Project getProject(int projectID) {
         Project ret = null;
-        for(Project project : projectVector) {
-            if(project.getProjectID() == projectID) {
+        for (Project project : projectVector) {
+            if (project.getProjectID() == projectID) {
                 ret = project;
             }
         }
         return ret;
     }
 
-    public static void loginButtonClicked(String username, String password) {
+    public static String loginButtonClicked(String username, String password) {
         if (checkIfUsernameExists(username)) {
             if (authenticate(username, password)) {
                 User.projectVector = loadAllProjectsFromDB(getUserID(username));        //Needed to pass all projects to the Projects page
-                for(int i = 0 ; i < projectVector.size(); i++) {
+                for (int i = 0; i < projectVector.size(); i++) {
                     //projectVector.elementAt(i).getProjectID();
                     //projectVector.elementAt(i).getName();
                     //projectVector.elementAt(i).getDescription();
                 }
+                return "Good";
                 //Todo: Open the Projects page for this user using the information in the loop above
             } else {
-                System.out.println("Password does not match Username");     //Todo: Change to pop-out window
+                return "Password does not match Username";     //Todo: Change to pop-out window
             }
         } else {
-            System.out.println("Username does not exist");      //Todo: Change to pop-out window
+            return "Username does not exist";      //Todo: Change to pop-out window
         }
     }
 
@@ -96,7 +103,7 @@ public class User {
             rs = pstmt.executeQuery();        //Execute the sql query and return the results to the ResultSet object
 
             //Add each project (row) from the project table to the project vector
-            while(rs.next()) {
+            while (rs.next()) {
                 projectID = rs.getInt("ProjectID");
                 name = rs.getString("Name");
                 description = rs.getString("Description");
@@ -104,7 +111,7 @@ public class User {
                 project = new Project(projectID, name, description, url);
                 projectVector.add(project);
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
@@ -119,7 +126,7 @@ public class User {
         int userID = 0;
         if (checkIfUsernameExists(username)) {
             System.out.println("Username already exists");     //Todo: Change to pop-out dialog
-        } else if(!checkPassword(password)) {
+        } else if (!checkPassword(password)) {
             System.out.println("Password must have more than 8 characters");     //Todo: Change to pop-out dialog
         } else {
             User.insertUserInAuthenticationDB(username, password, email);
@@ -140,7 +147,7 @@ public class User {
             rs = pstmt.executeQuery();
             rs.next();
             username = rs.getString("Username");
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
         Connect.closeConnection(conn);
@@ -158,7 +165,7 @@ public class User {
             rs = pstmt.executeQuery();
             rs.next();
             password = rs.getString("Password");
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
@@ -169,7 +176,7 @@ public class User {
         String url;
 
         //Every users project names must be unique
-        if(checkIfProjectNameAlreadyExists(userID, projectName)) {
+        if (checkIfProjectNameAlreadyExists(userID, projectName)) {
             System.out.println("Project Name already exists for this user.");    //Todo: Change to pop-out dialog
             return;
         }
@@ -209,7 +216,6 @@ public class User {
     }
 
 
-
     //Returns true if project name already exists for the user
     public static boolean checkIfProjectNameAlreadyExists(int userID, String projectName) {
         String sql = "SELECT COUNT(Project.ProjectID) " +
@@ -229,15 +235,14 @@ public class User {
             rs = pstmt.executeQuery();
             rs.next();
             resultCount = rs.getInt(1);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error:" + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
 
-        if(resultCount > 0) {
+        if (resultCount > 0) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -254,7 +259,7 @@ public class User {
             rs = pstmt.executeQuery();
             rs.next();
             databasePassword = rs.getString(1);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error:" + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
@@ -272,7 +277,7 @@ public class User {
             rs = pstmt.executeQuery();
             rs.next();
             userID = rs.getInt(1);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error:" + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
@@ -290,7 +295,7 @@ public class User {
             rs = pstmt.executeQuery();
             rs.next();
             count = rs.getInt(1);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error" + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
@@ -315,7 +320,7 @@ public class User {
             pstmt.setString(2, password);
             pstmt.setString(3, email);
             pstmt.executeUpdate();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
@@ -331,7 +336,7 @@ public class User {
             pstmt.setString(2, description);
             pstmt.setString(3, url);
             pstmt.executeUpdate();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);

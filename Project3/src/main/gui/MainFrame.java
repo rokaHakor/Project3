@@ -11,6 +11,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize((int)(screenSize.width*.6), (int)(screenSize.height*.6));
+        //setContentPane(new ProjectsPage().panel1);
         setContentPane(new LogIn(this).mainPanel);
     }
 }
