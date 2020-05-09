@@ -3,7 +3,7 @@
 
  */
 
-package main;
+package ssl.pms;
 
 import javax.print.attribute.IntegerSyntax;
 import java.util.Date;
@@ -20,7 +20,6 @@ public class Deliverable {
         this.name = name;
         this.description = description;
         this.dueDate = dueDate;
-
         uniqueID = "DEL" + deliverableID;
     }
 

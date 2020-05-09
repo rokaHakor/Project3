@@ -1,19 +1,18 @@
-package main;
+package ssl.pms;
 
 import java.util.Date;
 
 public class Issue {
 
     int issueID, priority, severity, status;
-    String uniqueID, name, description, statusDescription, priorityDefaults, severityDefaults, statusDefaults;
+    String uniqueID, name, description, statusDescription;
     Date dateRaised, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate;
 
-    public Issue(){}
+    public Issue() {}
 
     public Issue(int issueID, int priority, int severity, int status, String name, String description,
-                 String statusDescription, String priorityDefaults, String severityDefaults, String statusDefaults,
-                 Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
-                 Date updateDate) {
+                 String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate,
+                 Date actualCompletionDate, Date updateDate) {
 
         this.issueID = issueID;
         this.priority = priority;
@@ -22,9 +21,6 @@ public class Issue {
         this.name = name;
         this.description = description;
         this.statusDescription = statusDescription;
-        this.priorityDefaults = priorityDefaults;
-        this.severityDefaults = severityDefaults;
-        this.statusDefaults = statusDefaults;
         this.dateRaised = dateRaised;
         this.dateAssigned = dateAssigned;
         this.expectedCompletionDate = expectedCompletionDate;
@@ -35,7 +31,10 @@ public class Issue {
 
     public int getIssueID() { return issueID; }
     public String getUniqueID() { return uniqueID; }
-    public void setIssueID(int issueID) { this.issueID = issueID; }
+    public void setIssueID(int issueID) {
+        this.issueID = issueID;
+        uniqueID = "I" + issueID;
+    }
     public int getPriority() { return priority; }
     public void setPriority(int priority) { this.priority = priority; }
     public int getSeverity() { return severity; }
@@ -48,12 +47,6 @@ public class Issue {
     public void setDescription(String description) { this.description = description; }
     public String getStatusDescription() { return statusDescription; }
     public void setStatusDescription(String statusDescription) { this.statusDescription = statusDescription; }
-    public String getPriorityDefaults() { return priorityDefaults; }
-    public void setPriorityDefaults(String priorityDefaults) { this.priorityDefaults = priorityDefaults; }
-    public String getSeverityDefaults() { return severityDefaults; }
-    public void setSeverityDefaults(String severityDefaults) { this.severityDefaults = severityDefaults; }
-    public String getStatusDefaults() { return statusDefaults; }
-    public void setStatusDefaults(String statusDefaults) { this.statusDefaults = statusDefaults; }
     public Date getDateRaised() { return dateRaised; }
     public void setDateRaised(Date dateRaised) { this.dateRaised = dateRaised; }
     public Date getDateAssigned() { return dateAssigned; }
@@ -66,8 +59,7 @@ public class Issue {
     public void setUpdateDate(Date updateDate) { this.updateDate = updateDate; }
 
     public void updateIssue(int priority, int severity, int status, String name, String description,
-                            String statusDescription, String priorityDefaults, String severityDefaults, String statusDefaults,
-                            Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
+                            String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
                             Date updateDate) {
 
         setPriority(priority);
@@ -76,9 +68,6 @@ public class Issue {
         setName(name);
         setDescription(description);
         setStatusDescription(statusDescription);
-        setPriorityDefaults(priorityDefaults);
-        setSeverityDefaults(severityDefaults);
-        setStatusDescription(statusDefaults);
         setDateRaised(dateRaised);
         setDateAssigned(dateAssigned);
         setExpectedCompletionDate(expectedCompletionDate);

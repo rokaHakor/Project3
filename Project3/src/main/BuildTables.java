@@ -1,4 +1,4 @@
-package main;
+package ssl.pms;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,6 +21,7 @@ public class BuildTables {
         createIssueAffectingTaskTable(conn);
         createResourceSkillTable(conn);
         createMeetingNoteTable(conn);
+        createDefaultsTable(conn);
     }
 
     public static void createDeliverableTable(Connection conn) {
@@ -71,15 +72,12 @@ public class BuildTables {
                 "Name TEXT, " +
                 "Description TEXT, " +
                 "Priority INTEGER, " +
-                "Priority_Defaults TEXT, " +
                 "Severity INTEGER, " +
-                "Severity_Defaults TEXT, " +
                 "Date_Raised INTEGER, " +
                 "Date_Assigned INTEGER, " +
                 "Expected_Completion_Date INTEGER, " +
                 "Actual_Completion_Date INTEGER, " +
                 "Status INTEGER, " +
-                "Status_Defaults TEXT, " +
                 "Status_Description TEXT, " +
                 "Update_Date INTEGER);";
         try {
@@ -118,9 +116,8 @@ public class BuildTables {
                 "Expected_Completion_Date INTEGER, " +
                 "Actual_Completion_Date INTEGER, " +
                 "Status INTEGER," +
-                "Status_Defaults TEXT," +
-                "Status_DescriptionTEXT," +
-                "Update_DateTEXT," +
+                "Status_Description TEXT," +
+                "Update_Date TEXT," +
                 "FOREIGN KEY(IssueID) REFERENCES Issue(IssueID)," +
                 "FOREIGN KEY(RiskID) REFERENCES Risk(RiskID)" +
                 "FOREIGN KEY(ResourceID) REFERENCES Resource(ResourceID));";
@@ -137,10 +134,10 @@ public class BuildTables {
                 "RequirementID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, " +
                 "DeliverableID INTEGER, " +
                 "Name TEXT, " +
-                "Requirement Text TEXT, " +
-                "Source Document TEXT, " +
-                "Location in Source Document TEXT, " +
-                "Client Reference TEXT, " +
+                "Requirement_Text TEXT, " +
+                "Source_Document TEXT, " +
+                "Location_In_Source_Document TEXT, " +
+                "Client_Reference TEXT, " +
                 "FOREIGN KEY(DeliverableID) REFERENCES Deliverable(DeliverableID) " +
                 ");";
         try {
@@ -159,9 +156,7 @@ public class BuildTables {
                 "Name TEXT, " +
                 "Description TEXT, " +
                 "Priority INTEGER, " +
-                "Priority_Defaults TEXT, " +
                 "Impact INTEGER, " +
-                "Impact_Defaults TEXT, " +
                 "Date_Created INTEGER, " +
                 "Date_Needed INTEGER, " +
                 "Date_Made INTEGER, " +
@@ -169,7 +164,6 @@ public class BuildTables {
                 "Actual_Completion_Date INTEGER, " +
                 "Note_Date INTEGER, " +
                 "Status INTEGER, " +
-                "Status_Defaults TEXT, " +
                 "Status_Description TEXT, " +
                 "Update_Date INTEGER, " +
                 "FOREIGN KEY(ResourceID) REFERENCES Resource(ResourceID) " +
@@ -201,11 +195,9 @@ public class BuildTables {
                 "RiskID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, " +
                 "DeliverableID INTEGER, " +
                 "Category INTEGER, " +
-                "Category_Defaults TEXT, " +
                 "Name TEXT, " +
                 "Probability REAL, " +
                 "Impact INTEGER, " +
-                "Impact_Defaults TEXT, " +
                 "Mitigation TEXT, " +
                 "Contingency TEXT, " +
                 "Action_By INTEGER, " +
@@ -225,7 +217,6 @@ public class BuildTables {
                 "Date_Requested INTEGER, " +
                 "Requestor TEXT, " +
                 "Status INTEGER, " +
-                "Status_Defaults TEXT, " +
                 "Update Date INTEGER);";
         try {
             Statement stmt = conn.createStatement();
@@ -293,5 +284,15 @@ public class BuildTables {
         } catch(SQLException e) {
             System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
         }
+    }
+
+    public static void createDefaultsTable(Connection conn) {
+        String sql = "CREATE TABLE Defaults (" +
+                "Severity_Defaults TEXT, " +
+                "Priority_Defaults TEXT, " +
+                "Status_Defaults TEXT, " +
+                "Category_Defaults TEXT, " +
+                "Impact_Defaults TEXT, " +
+                ");";
     }
 }   //End class

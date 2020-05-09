@@ -1,12 +1,18 @@
-package main;
+package ssl.pms;
+
+import java.util.Date;
 
 public class Risk {
 
     int riskID, deliverableID, category, impact;
-    String uniqueID, name, mitigation, contingency, categoryDefaults, impactDefaults;
+    String uniqueID, name, mitigation, contingency;
     float probability;
+    Date actionBy;
 
-    public Risk(int riskID, int deliverableID, int category, int impact, String name, String mitigation, String contingency, String categoryDefaults, String impactDefaults, float probability) {
+    public Risk() {}
+
+    public Risk(int riskID, int deliverableID, int category, int impact, String name, String mitigation,
+                String contingency, Date actionBy, float probability) {
         this.riskID = riskID;
         this.deliverableID = deliverableID;
         this.category = category;
@@ -14,14 +20,16 @@ public class Risk {
         this.name = name;
         this.mitigation = mitigation;
         this.contingency = contingency;
-        this.categoryDefaults = categoryDefaults;
-        this.impactDefaults = impactDefaults;
+        this.actionBy = actionBy;
         this.probability = probability;
         uniqueID = "RI" + riskID;
     }
 
     public int getRiskID() { return riskID; }
-    public void setRiskID(int riskID) { this.riskID = riskID; }
+    public void setRiskID(int riskID) {
+        this.riskID = riskID;
+        uniqueID = "RI" + riskID;
+    }
     public int getDeliverableID() { return deliverableID; }
     public void setDeliverableID(int deliverableID) { this.deliverableID = deliverableID; }
     public int getCategory() { return category; }
@@ -36,11 +44,9 @@ public class Risk {
     public void setMitigation(String mitigation) { this.mitigation = mitigation; }
     public String getContingency() { return contingency; }
     public void setContingency(String contingency) { this.contingency = contingency; }
-    public String getCategoryDefaults() { return categoryDefaults; }
-    public void setCategoryDefaults(String categoryDefaults) { this.categoryDefaults = categoryDefaults; }
-    public String getImpactDefaults() { return impactDefaults; }
-    public void setImpactDefaults(String impactDefaults) { this.impactDefaults = impactDefaults; }
     public float getProbability() { return probability; }
     public void setProbability(float probability) { this.probability = probability; }
+    public Date getActionBy() { return actionBy; }
+    public void setActionBy(Date actionBy) { this.actionBy = actionBy; }
 
 }

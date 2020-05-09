@@ -1,16 +1,18 @@
-package main;
+package ssl.pms;
 
 import java.util.Date;
 
 public class ActionItem {
 
     int actionItemID, issueID, riskID, resourceID, status;
-    String uniqueID, name, description, statusDescription, statusDefaults;
+    String uniqueID, name, description, statusDescription;
     Date dateCreated, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate;
 
+    public ActionItem() {}
+
     public ActionItem(int actionItemID, int issueID, int riskID, int resourceID, int status, String name,
-                      String description, String statusDescription, String statusDefaults, Date dateCreated,
-                      Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
+                      String description, String statusDescription, Date dateCreated, Date dateAssigned,
+                      Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
 
         this.actionItemID = actionItemID;
         this.issueID = issueID;
@@ -20,7 +22,6 @@ public class ActionItem {
         this.name = name;
         this.description = description;
         this.statusDescription = statusDescription;
-        this.statusDefaults = statusDefaults;
         this.dateCreated = dateCreated;
         this.dateAssigned = dateAssigned;
         this.expectedCompletionDate = expectedCompletionDate;
@@ -30,7 +31,10 @@ public class ActionItem {
     }
 
     public int getActionItemID() { return actionItemID; }
-    public void setActionItemID(int actionItemID) { this.actionItemID = actionItemID; }
+    public void setActionItemID(int actionItemID) {
+        this.actionItemID = actionItemID;
+        uniqueID = "A" + actionItemID;
+    }
     public String getUniqueID() { return uniqueID; }
     public int getIssueID() { return issueID; }
     public void setIssueID(int issueID) { this.issueID = issueID; }
@@ -46,8 +50,6 @@ public class ActionItem {
     public void setDescription(String description) { this.description = description; }
     public String getStatusDescription() { return statusDescription; }
     public void setStatusDescription(String statusDescription) { this.statusDescription = statusDescription; }
-    public String getStatusDefaults() { return statusDefaults; }
-    public void setStatusDefaults(String statusDefaults) { this.statusDefaults = statusDefaults; }
     public Date getDateCreated() { return dateCreated; }
     public void setDateCreated(Date dateCreated) { this.dateCreated = dateCreated; }
     public Date getDateAssigned() { return dateAssigned; }

@@ -1,16 +1,17 @@
-package main;
+package ssl.pms;
 
 import java.util.Date;
 
 public class Decision {
 
     private int decisionID, resourceID, issueID, priority, impact, status;
-    String uniqueID, name, description, priorityDefaults, impactDefaults, statusDefaults, statusDescription;
+    String uniqueID, name, description, statusDescription;
     Date dateCreated, dateNeeded, dateMade, expectedCompletionDate, actualCompletionDate, noteDate, updateDate;
 
+    public Decision() {}
+
     public Decision(int decisionID, int resourceID, int issueID, int priority, int impact, int status, String name,
-                    String description, String priorityDefaults, String impactDefaults, String statusDefaults,
-                    String statusDescription, Date dateCreated, Date dateNeeded, Date dateMade,
+                    String description, String statusDescription, Date dateCreated, Date dateNeeded, Date dateMade,
                     Date expectedCompletionDate, Date actualCompletionDate, Date noteDate, Date updateDate) {
 
         this.decisionID = decisionID;
@@ -21,9 +22,6 @@ public class Decision {
         this.status = status;
         this.name = name;
         this.description = description;
-        this.priorityDefaults = priorityDefaults;
-        this.impactDefaults = impactDefaults;
-        this.statusDefaults = statusDefaults;
         this.statusDescription = statusDescription;
         this.dateCreated = dateCreated;
         this.dateNeeded = dateNeeded;
@@ -36,7 +34,10 @@ public class Decision {
     }
 
     public int getDecisionID() { return decisionID; }
-    public void setDecisionID(int decisionID) { this.decisionID = decisionID; }
+    public void setDecisionID(int decisionID) {
+        this.decisionID = decisionID;
+        uniqueID = "DEC" + decisionID;
+    }
     public String getUniqueID() { return uniqueID; }
     public int getResourceID() { return resourceID; }
     public void setResourceID(int resourceID) { this.resourceID = resourceID; }
@@ -52,12 +53,6 @@ public class Decision {
     public void setName(String name) { this.name = name; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public String getPriorityDefaults() { return priorityDefaults; }
-    public void setPriorityDefaults(String priorityDefaults) { this.priorityDefaults = priorityDefaults; }
-    public String getImpactDefaults() { return impactDefaults; }
-    public void setImpactDefaults(String impactDefaults) { this.impactDefaults = impactDefaults; }
-    public String getStatusDefaults() { return statusDefaults; }
-    public void setStatusDefaults(String statusDefaults) { this.statusDefaults = statusDefaults; }
     public String getStatusDescription() { return statusDescription; }
     public void setStatusDescription(String statusDescription) { this.statusDescription = statusDescription; }
     public Date getDateCreated() { return dateCreated; }

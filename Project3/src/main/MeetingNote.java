@@ -1,4 +1,4 @@
-package main;
+package ssl.pms;
 
 public class MeetingNote {
 
