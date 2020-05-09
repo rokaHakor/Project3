@@ -13,7 +13,7 @@ public class Connect {
         try {
             conn = DriverManager.getConnection(url);
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
         return conn;
     }
@@ -25,7 +25,7 @@ public class Connect {
                 conn.close();
             }
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

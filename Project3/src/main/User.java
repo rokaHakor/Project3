@@ -145,7 +145,7 @@ public class User {
             rs.next();
             username = rs.getString("Username");
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
         Connect.closeConnection(conn);
         sendForgotUsernameEmail(username, email);
@@ -163,7 +163,7 @@ public class User {
             rs.next();
             password = rs.getString("Password");
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
         sendForgotPasswordEmail(password, email);
@@ -318,7 +318,7 @@ public class User {
             pstmt.setString(3, email);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -334,7 +334,7 @@ public class User {
             pstmt.setString(3, url);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -348,7 +348,7 @@ public class User {
             pstmt.setInt(1, userID);
             pstmt.setInt(2, projectID);
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
