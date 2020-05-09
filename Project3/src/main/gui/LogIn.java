@@ -24,7 +24,7 @@ public class LogIn {
                 String value = User.loginButtonClicked(userText.getText(), String.valueOf(passwordField1.getPassword()));
                 if (value.equals("Good")) {
                     frame.getContentPane().remove(frame.getContentPane());
-                    frame.setContentPane(new ProjectGUI().panel1);
+                    frame.setContentPane(new ProjectsPage().panel1);
                     frame.revalidate();
                     frame.repaint();
                 } else {

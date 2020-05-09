@@ -34,7 +34,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -62,7 +62,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -84,7 +84,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -99,7 +99,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -125,7 +125,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -144,7 +144,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -172,7 +172,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -186,7 +186,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -206,7 +206,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -222,7 +222,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -238,7 +238,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -254,7 +254,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -268,7 +268,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 
@@ -282,7 +282,7 @@ public class BuildTables {
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
     }
 

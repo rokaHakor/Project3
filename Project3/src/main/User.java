@@ -109,7 +109,7 @@ public class User {
                 projectVector.add(project);
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
         return projectVector;
@@ -119,17 +119,18 @@ public class User {
         //Todo: Open the form to enter the new user's username, password & email (form contains Create User Button)
     }
 
-    public static void createUserButtonClicked(String username, String password, String email) {
+    public static String createUserButtonClicked(String username, String password, String email) {
         int userID = 0;
         if (checkIfUsernameExists(username)) {
-            System.out.println("Username already exists");     //Todo: Change to pop-out dialog
+            return "Username already exists";     //Todo: Change to pop-out dialog
         } else if (!checkPassword(password)) {
-            System.out.println("Password must have more than 8 characters");     //Todo: Change to pop-out dialog
+            return "Password must have at least 8 characters";     //Todo: Change to pop-out dialog
         } else {
             User.insertUserInAuthenticationDB(username, password, email);
             userID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(""), "User", "UserID");
             //Todo: Open the Projects page for this newly created user
             //Todo: Send email verification to user
+            return "Good";
         }
     }
 
@@ -233,7 +234,7 @@ public class User {
             rs.next();
             resultCount = rs.getInt(1);
         } catch (SQLException e) {
-            System.out.println("Error:" + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
 
@@ -246,7 +247,7 @@ public class User {
 
     //Returns true if password matches the password in the database for that Username
     public static boolean authenticate(String username, String password) {
-        String sql = "SELECT Password FROM User WHERE username = \"?\"";
+        String sql = "SELECT Password FROM User WHERE Username = ?";
         ResultSet rs = null;
         String databasePassword = "";       //Used for the password that is saved in the database
         Connection conn = Connect.getConnectionToDB("");
@@ -257,14 +258,14 @@ public class User {
             rs.next();
             databasePassword = rs.getString(1);
         } catch (SQLException e) {
-            System.out.println("Error:" + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
         return databasePassword.equals(password);
     }
 
     public static int getUserID(String username) {
-        String sql = "SELECT UserID FROM User WHERE username = \"?\"";
+        String sql = "SELECT UserID FROM User WHERE Username = ?";
         ResultSet rs = null;
         int userID = 0;       //Used for the password that is saved in the database
         Connection conn = Connect.getConnectionToDB("");
@@ -275,14 +276,14 @@ public class User {
             rs.next();
             userID = rs.getInt(1);
         } catch (SQLException e) {
-            System.out.println("Error:" + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
         return userID;
     }
 
     public static boolean checkIfUsernameExists(String username) {
-        String sql = "SELECT COUNT(*) FROM User WHERE username = \"?\"";
+        String sql = "SELECT COUNT(*) FROM User WHERE Username = ?";
         ResultSet rs = null;
         Connection conn = Connect.getConnectionToDB("");
         int count = 0;
@@ -293,7 +294,7 @@ public class User {
             rs.next();
             count = rs.getInt(1);
         } catch (SQLException e) {
-            System.out.println("Error" + e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace(); //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
         return count > 0;
@@ -305,7 +306,7 @@ public class User {
 
     //Returns true if password meets microsoft standards
     public static boolean checkPassword(String password) {
-        return password.length() > 8;
+        return password.length() >= 8;
     }
 
     public static void insertUserInAuthenticationDB(String username, String password, String email) {

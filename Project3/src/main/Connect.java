@@ -45,7 +45,7 @@ public class Connect {
             rs.next();
             id = rs.getInt(1);
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Chance to pop-out dialog
+            e.printStackTrace();     //Todo: Chance to pop-out dialog
         }
         closeConnection(conn);
         return id;

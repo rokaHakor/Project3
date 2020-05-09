@@ -29,16 +29,17 @@ public class ProjectsPage {
         panel.add(createProject, BorderLayout.NORTH);
         leftPanel.add(panel);
 
+        displayProjects();
 
         createProject.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFrame issueForm = new JFrame();
-                issueForm.setTitle("Issue Form");
-                issueForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                issueForm.setContentPane(new IssueForm(issueForm).panel1);
-                issueForm.pack();
-                issueForm.setVisible(true);
+                JFrame projectForm = new JFrame();
+                projectForm.setTitle("Project Form");
+                projectForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                projectForm.setContentPane(new ProjectForm(projectForm).panel1);
+                projectForm.pack();
+                projectForm.setVisible(true);
             }
         });
     }

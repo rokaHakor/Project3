@@ -25,9 +25,14 @@ public class CreateAccountGUI {
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Arrays.equals(passwordField1.getPassword(), passwordField2.getPassword()) && emailText.getText().contains("@")) {
-                    User.createUserButtonClicked(usernameText.getText(), String.valueOf(passwordField1.getPassword()), emailText.getText());
-                    mainFrame.dispose();
+                if (Arrays.equals(passwordField1.getPassword(), passwordField2.getPassword())) {
+                    String s = User.createUserButtonClicked(usernameText.getText(), String.valueOf(passwordField1.getPassword()), emailText.getText());
+                    if (s.equals("Good")) {
+                        mainFrame.dispose();
+                    } else {
+                        errorLabel.setText(s);
+                        errorLabel.setVisible(true);
+                    }
                 } else {
                     errorLabel.setVisible(true);
                 }

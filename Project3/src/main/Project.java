@@ -6,7 +6,7 @@
         try {
 
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
 
@@ -146,7 +146,7 @@ public class Project {
             pstmt.setInt(3, tableID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -161,7 +161,7 @@ public class Project {
             pstmt.setInt(3, rowID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -242,7 +242,7 @@ public class Project {
             pstmt.setLong(3, User.convertDateToLong(dueDate));
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -321,7 +321,7 @@ public class Project {
             pstmt.setInt(4, deliverableID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Chance to pop-out dialog
+            e.printStackTrace();     //Todo: Chance to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -348,7 +348,7 @@ public class Project {
                 deliverableVector.add(del);
             }
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -547,7 +547,7 @@ public class Project {
             pstmt.setInt(14, resourceID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -584,7 +584,7 @@ public class Project {
                 taskVector.add(task);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -681,7 +681,7 @@ public class Project {
             pstmt.setInt(15, task.getTaskID());
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -843,7 +843,7 @@ public class Project {
             pstmt.setLong(11, User.convertDateToLong(updateDate));
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -873,7 +873,7 @@ public class Project {
             pstmt.setInt(15, issueID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -906,7 +906,7 @@ public class Project {
                 issueVector.add(issue);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -979,7 +979,7 @@ public class Project {
             pstmt.setLong(10, User.convertDateToLong(updateDate));
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1013,7 +1013,7 @@ public class Project {
                 actionItemVector.add(actionItem);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1056,7 +1056,7 @@ public class Project {
             pstmt.setInt(11, actionItemID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1095,7 +1095,7 @@ public class Project {
             pstmt.setFloat(4, payRate);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1119,7 +1119,7 @@ public class Project {
             pstmt.setInt(5, resourceID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1182,7 +1182,7 @@ public class Project {
                 resourceVector.add(resource);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1223,7 +1223,7 @@ public class Project {
                 requirementVector.add(requirement);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1271,7 +1271,7 @@ public class Project {
                 decisionVector.add(decision);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1303,7 +1303,7 @@ public class Project {
                 referenceDocumentVector.add(referenceDocument);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1344,7 +1344,7 @@ public class Project {
                 riskVector.add(risk);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1382,7 +1382,7 @@ public class Project {
                 changeVector.add(change);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1411,7 +1411,7 @@ public class Project {
             pstmt.setInt(3, dependency);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1426,7 +1426,7 @@ public class Project {
             pstmt.setInt(3, predecessorID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1440,7 +1440,7 @@ public class Project {
             pstmt.setInt(2, predecessorID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1461,7 +1461,7 @@ public class Project {
                 dependentVector.add(dependent);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1477,7 +1477,7 @@ public class Project {
             pstmt.setInt(2, taskID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1491,7 +1491,7 @@ public class Project {
             pstmt.setInt(2, issueID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            e.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1513,7 +1513,7 @@ public class Project {
                 issueAffectingTaskVector.add(issueAffectingTask);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1535,7 +1535,7 @@ public class Project {
                 meetingNoteVector.add(meetingNote);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1557,7 +1557,7 @@ public class Project {
                 resourceSkillVector.add(resourceSkill);
             }
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1581,7 +1581,7 @@ public class Project {
             this.defaults = defaults;
 
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
     }
@@ -1599,7 +1599,7 @@ public class Project {
             pstmt.setString(5, "Critical, High, Medium, Low, Minor");
             pstmt.executeUpdate();
         } catch(SQLException ex) {
-            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+            ex.printStackTrace();     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
 
