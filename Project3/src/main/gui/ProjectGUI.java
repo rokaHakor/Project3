@@ -1,9 +1,12 @@
 package main.gui;
 
+import main.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class ProjectGUI {
     public JPanel panel1;
@@ -19,6 +22,11 @@ public class ProjectGUI {
     private JPanel resourcesPanel;
     private JRadioButton ganttChart;
     private JLabel projectName;
+    ArrayList<Deliverable> deliverables = new ArrayList<>();
+    ArrayList<Task> tasks = new ArrayList<>();
+    ArrayList<Issue> issues = new ArrayList<>();
+    ArrayList<ActionItem> actionItems = new ArrayList<>();
+    ArrayList<Resource> resources = new ArrayList<>();
 
     public ProjectGUI() {
         deliverablesPanel.setLayout(new BoxLayout(deliverablesPanel, BoxLayout.Y_AXIS));
@@ -101,7 +109,7 @@ public class ProjectGUI {
         ganttChart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                panel1.setVisible(false);
             }
         });
     }
