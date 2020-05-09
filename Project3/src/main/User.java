@@ -46,9 +46,19 @@ public class User {
 
     private static Vector<Project> projectVector;
 
-
+    public static Vector<Project> getProjectVector() { return projectVector; }
     public static void setProjectVector(Vector<Project> projectVector) {
         User.projectVector = projectVector;
+    }
+
+    public static Project getProject(int projectID) {
+        Project ret = null;
+        for(Project project : projectVector) {
+            if(project.getProjectID() == projectID) {
+                ret = project;
+            }
+        }
+        return ret;
     }
 
     public static void loginButtonClicked(String username, String password) {
