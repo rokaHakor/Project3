@@ -105,6 +105,10 @@ public class ProjectGUI {
         });
     }
 
+    public void refreshPanels(){
+
+    }
+
     private void addDeliverables() {
         for (int x = 1; x <= 10; x++) {
             deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
