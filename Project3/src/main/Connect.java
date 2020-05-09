@@ -5,7 +5,7 @@ import java.sql.*;
 public class Connect {
 
     public static Connection getConnectionToDB(String url) {
-        String url1 = "jdbc:sqlite:C:/Users/bezan/Documents/SQLiteJDBC/PMS/PmsAuthentication.db";    //Todo: Change url to sql server
+        String url1 = "jdbc:sqlite:PmsAuthentication.db";    //Todo: Change url to sql server
         if(url.equals("")) {
             url = url1;
         }

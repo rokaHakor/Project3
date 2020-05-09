@@ -45,6 +45,7 @@ import java.util.Date;
 public class User {
 
     private static Vector<Project> projectVector;
+    private static int userID;
 
     public static Vector<Project> getProjectVector() { return projectVector; }
     public static void setProjectVector(Vector<Project> projectVector) {
@@ -65,11 +66,7 @@ public class User {
         if (checkIfUsernameExists(username)) {
             if (authenticate(username, password)) {
                 User.projectVector = loadAllProjectsFromDB(getUserID(username));        //Needed to pass all projects to the Projects page
-                for(int i = 0 ; i < projectVector.size(); i++) {
-                    //projectVector.elementAt(i).getProjectID();
-                    //projectVector.elementAt(i).getName();
-                    //projectVector.elementAt(i).getDescription();
-                }
+                User.userID = getUserID(username);
                 //Todo: Open the Projects page for this user using the information in the loop above
             } else {
                 System.out.println("Password does not match Username");     //Todo: Change to pop-out window
@@ -174,7 +171,7 @@ public class User {
             return;
         }
 
-        url = "jdbc:sqlite:C:/Users/bezan/Documents/SQLiteJDBC/PMS/" + projectName + userID + ".db";
+        url = "jdbc:sqlite:" + projectName + userID + ".db";
         insertProjectInAuthenticationDB(projectName, description, url);
         int projectID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(""), "Project", "ProjectID");    //url: "" species Authentication database
         insertProjectAuthorizationInDB(userID, projectID);
@@ -207,8 +204,6 @@ public class User {
         project.loadAllDefaultsFromDB();
         //Todo: Open Deliverable sheet in the projects Overview page
     }
-
-
 
     //Returns true if project name already exists for the user
     public static boolean checkIfProjectNameAlreadyExists(int userID, String projectName) {
