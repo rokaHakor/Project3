@@ -76,6 +76,66 @@ public class Project {
     public void setName(String name) {this.name = name;}
     public void setDescription(String description) {this.description = description;}
 
+    public Vector<Deliverable> getDeliverableVector() {
+        return deliverableVector;
+    }
+
+    public Vector<Task> getTaskVector() {
+        return taskVector;
+    }
+
+    public Vector<Issue> getIssueVector() {
+        return issueVector;
+    }
+
+    public Vector<ActionItem> getActionItemVector() {
+        return actionItemVector;
+    }
+
+    public Vector<Resource> getResourceVector() {
+        return resourceVector;
+    }
+
+    public Vector<Requirement> getRequirementVector() {
+        return requirementVector;
+    }
+
+    public Vector<Decision> getDecisionVector() {
+        return decisionVector;
+    }
+
+    public Vector<ReferenceDocument> getReferenceDocumentVector() {
+        return referenceDocumentVector;
+    }
+
+    public Vector<Risk> getRiskVector() {
+        return riskVector;
+    }
+
+    public Vector<Change> getChangeVector() {
+        return changeVector;
+    }
+
+    public Vector<Dependent> getDependentVector() {
+        return dependentVector;
+    }
+
+    public Vector<IssueAffectingTask> getIssueAffectingTaskVector() {
+        return issueAffectingTaskVector;
+    }
+
+    public Vector<MeetingNote> getMeetingNoteVector() {
+        return meetingNoteVector;
+    }
+
+    public Vector<ResourceSkill> getResourceSkillVector() {
+        return resourceSkillVector;
+    }
+
+    public Defaults getDefaults() {
+        return defaults;
+    }
+
     public void deleteRecordFromTableInDB(String tableName, String tableIDName, int tableID) {
         String sql = "DELETE FROM ? WHERE ? = ?";
         Connection conn = Connect.getConnectionToDB(getUrl());
