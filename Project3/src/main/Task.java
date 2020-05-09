@@ -1,4 +1,4 @@
-package main;
+package ssl.pms;
 
 import java.util.Date;
 
@@ -13,9 +13,9 @@ public class Task {
     public Task() {
     }
 
-    public Task(int taskID, int deliverableID, int resourceID, String name, String description, java.sql.Date expectedStartDate,
-                java.sql.Date expectedEndDate, long expectedDuration, int expectedEffort, java.sql.Date actualStartDate,
-                java.sql.Date actualEndDate, long actualDuration, int effortCompleted, int actualEffort,
+    public Task(int taskID, int deliverableID, int resourceID, String name, String description, Date expectedStartDate,
+                Date expectedEndDate, long expectedDuration, int expectedEffort, Date actualStartDate,
+                Date actualEndDate, long actualDuration, int effortCompleted, int actualEffort,
                 int percentComplete, int type) {
 
         this.taskID = taskID;

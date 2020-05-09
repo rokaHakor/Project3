@@ -1,9 +1,11 @@
-package main;
+package ssl.pms;
 
 public class Requirement {
 
     int requirementID, deliverableID;
     String uniqueID, name, requirementText, sourceDocument, locationInSourceDocument, clientReference;
+
+    Requirement() {}
 
     Requirement(int requirementID, int deliverableID, String name, String requirementText,
                 String sourceDocument, String locationInSourceDocument, String clientReference) {
@@ -29,7 +31,10 @@ public class Requirement {
     public String getClientReference() { return clientReference; }
 
     //SETTERS
-    public void setRequirementID(int requirementID) { this.requirementID = requirementID; }
+    public void setRequirementID(int requirementID) {
+        this.requirementID = requirementID;
+        uniqueID = "REQ" + requirementID;
+    }
     public void setDeliverableID(int deliverableID) { this.deliverableID = deliverableID; }
     public void setUniqueID(String uniqueID) { this.uniqueID = uniqueID; }
     public void setName(String name) { this.name = name; }

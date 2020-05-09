@@ -36,7 +36,7 @@ public static Date convertLongToDate(long dateLong)
 */
 
 
-package main;
+package ssl.pms;
 
 import java.sql.*;
 import java.util.Vector;
@@ -54,7 +54,7 @@ public class User {
     public static void loginButtonClicked(String username, String password) {
         if (checkIfUsernameExists(username)) {
             if (authenticate(username, password)) {
-                Vector<Project> projectVector = loadAllProjectsFromDB(getUserID(username));        //Needed to pass all projects to the Projects page
+                User.projectVector = loadAllProjectsFromDB(getUserID(username));        //Needed to pass all projects to the Projects page
                 for(int i = 0 ; i < projectVector.size(); i++) {
                     //projectVector.elementAt(i).getProjectID();
                     //projectVector.elementAt(i).getName();
@@ -67,6 +67,38 @@ public class User {
         } else {
             System.out.println("Username does not exist");      //Todo: Change to pop-out window
         }
+    }
+
+    public static Vector<Project> loadAllProjectsFromDB(int userID) {
+        String sql = "SELECT Project.ProjectID, Project.Name, Project.Description, Project.Url " +
+                "FROM Project, Project_Authorization " +
+                "ON Project.ProjectID = Project_Authorization.projectID " +
+                "WHERE Project_Authorization.UserID = ?";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Vector<Project> projectVector = new Vector<>();        //Used to hold every deliverable in the database
+        Project project;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB("");
+        int projectID = 0;
+        String name, description, url;
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userID);
+            rs = pstmt.executeQuery();        //Execute the sql query and return the results to the ResultSet object
+
+            //Add each project (row) from the project table to the project vector
+            while(rs.next()) {
+                projectID = rs.getInt("ProjectID");
+                name = rs.getString("Name");
+                description = rs.getString("Description");
+                url = rs.getString("url");
+                project = new Project(projectID, name, description, url);
+                projectVector.add(project);
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+        return projectVector;
     }
 
     public static void newUserButtonClicked() {
@@ -137,8 +169,13 @@ public class User {
         int projectID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(""), "Project", "ProjectID");    //url: "" species Authentication database
         insertProjectAuthorizationInDB(userID, projectID);
         Project project = new Project(projectID, projectName, description, url);
+
         BuildTables.buildPMSDatabase(Connect.getConnectionToDB(project.getUrl()));      //Create database tables and add them to the database at the above url
+
+        project.insertDefaultValuesInDefaultsTableInDBAndProject();     //Add the default values for
+
         projectVector.add(project);
+
         //Todo: Open Deliverable Overview page for this project (should be blank)
     }
 
@@ -157,9 +194,11 @@ public class User {
         project.loadAllIssueAffectingTasksFromDB();
         project.loadAllDependentsFromDB();
         project.loadAllMeetingNotesFromDB();
-
+        project.loadAllDefaultsFromDB();
         //Todo: Open Deliverable sheet in the projects Overview page
     }
+
+
 
     //Returns true if project name already exists for the user
     public static boolean checkIfProjectNameAlreadyExists(int userID, String projectName) {
@@ -300,36 +339,6 @@ public class User {
             System.out.println("Error: " + e.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
-    }
-
-    public static Vector<Project> loadAllProjectsFromDB(int userID) {
-        String sql = "SELECT * FROM Project WHERE Project.ProjectID = Project_Authorization.projectID AND " +
-                "Project_Authorization.UserID = ?";
-        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
-        Vector<Project> projectVector = new Vector<>();        //Used to hold every deliverable in the database
-        Project project;          //Used for the individual Deliverable object before it is added to the deliverables vector
-        Connection conn = Connect.getConnectionToDB("");
-        int projectID = 0;
-        String name, description, url;
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, userID);
-            rs = pstmt.executeQuery();        //Execute the sql query and return the results to the ResultSet object
-
-            //Add each project (row) from the project table to the project vector
-            while(rs.next()) {
-                projectID = rs.getInt("ProjectID");
-                name = rs.getString("Name");
-                description = rs.getString("Description");
-                url = rs.getString("url");
-                project = new Project(projectID, name, description, url);
-                projectVector.add(project);
-            }
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-        return projectVector;
     }
 
     public static void sendForgotUsernameEmail(String username, String email) {

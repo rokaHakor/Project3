@@ -1,4 +1,4 @@
-package main;
+package ssl.pms;
 
 public class ReferenceDocument {
 
@@ -13,7 +13,10 @@ public class ReferenceDocument {
     }
 
     public int getReferenceDocumentID() { return referenceDocumentID; }
-    public void setReferenceDocumentID(int referenceDocumentID) { this.referenceDocumentID = referenceDocumentID; }
+    public void setReferenceDocumentID(int referenceDocumentID) {
+        this.referenceDocumentID = referenceDocumentID;
+        uniqueID = "REF" + referenceDocumentID;
+    }
     public int getDecisionID() { return decisionID; }
     public void setDecisionID(int decisionID) { this.decisionID = decisionID; }
     public String getName() { return name; }

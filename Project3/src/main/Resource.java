@@ -1,10 +1,12 @@
-package main;
+package ssl.pms;
 
 public class Resource {
 
     int resourceID;
     String name, title, availability, uniqueID;
     float payRate;
+
+    public Resource() {}
 
     public Resource(int resourceID, String name, String title, String availability, float payRate) {
         this.resourceID = resourceID;
@@ -16,7 +18,10 @@ public class Resource {
     }
 
     public int getResourceID() { return resourceID; }
-    public void setResourceID(int resourceID) { this.resourceID = resourceID; }
+    public void setResourceID(int resourceID) {
+        this.resourceID = resourceID;
+        uniqueID = "RES" + resourceID;
+    }
     public String getUniqueID() { return uniqueID; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

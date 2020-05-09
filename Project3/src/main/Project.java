@@ -12,13 +12,18 @@
 
  */
 
-package main;
+package ssl.pms;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Date;
 
 public class Project {
     int projectID;
@@ -38,6 +43,7 @@ public class Project {
     Vector<IssueAffectingTask> issueAffectingTaskVector;
     Vector<MeetingNote> meetingNoteVector;
     Vector<ResourceSkill> resourceSkillVector;
+    Defaults defaults;
     
 
     public Project(int projectID, String name, String description, String url) {
@@ -52,6 +58,15 @@ public class Project {
         actionItemVector = new Vector<>();
         resourceVector = new Vector<>();
         requirementVector = new Vector<>();
+        decisionVector = new Vector<>();
+        referenceDocumentVector = new Vector<>();
+        riskVector = new Vector<>();
+        changeVector = new Vector<>();
+        dependentVector = new Vector<>();
+        issueAffectingTaskVector = new Vector<>();
+        meetingNoteVector = new Vector<>();
+        resourceSkillVector = new Vector<>();
+        defaults = new Defaults();
     }
 
     int getProjectID() {return projectID;}
@@ -61,11 +76,42 @@ public class Project {
     public void setName(String name) {this.name = name;}
     public void setDescription(String description) {this.description = description;}
 
+    public void deleteRecordFromTableInDB(String tableName, String tableIDName, int tableID) {
+        String sql = "DELETE FROM ? WHERE ? = ?";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, tableName);
+            pstmt.setString(2, tableIDName);
+            pstmt.setInt(3, tableID);
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
+    public void updateAttributeForTableInDB(String tableName, String attributeIDName, int rowID, int newValue) {
+        String sql = "UPDATE ? SET ? = 0 WHERE TaskID = ?";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, tableName);
+            pstmt.setString(2, attributeIDName);
+            pstmt.setInt(3, rowID);
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
     /*********************************************** DELIVERABLE ******************************************************/
     
     public void createDeliverableButtonClicked(String name, String description, Date dueDate, Vector<Integer> requirementIDVector, Vector<Integer> taskIDVector) {
         insertDeliverableInDB(name, description, dueDate);
         int deliverableID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(getUrl()), "Deliverable", "DeliverableID");      //Get the id of the deliverable that was just inserted into the database (database handles primary key auto increment)
+        Deliverable deliverable;
         Requirement requirement = null;
         Task task = null;
 
@@ -73,17 +119,18 @@ public class Project {
         // -Insert the deliverableID of the Deliverable being created into each row of the Requirement & Task tables that have been associated with it
         // -Set requirementID or TaskID for the Requirement or Task obj in the requirementVector or taskVector
         for(int requirementID : requirementIDVector) {
-            updateDeliverableIDInRequirementInDB(deliverableID, requirementID);    //Update the Requirement records DeliverableID attribute in the database
+            updateAttributeForTableInDB("Requirement", "DeliverableID", requirementID, deliverableID);  //Update the Requirement records DeliverableID attribute in the database
             requirement = getRequirement(requirementID);        //Get the Requirement object whose association is being added
             requirement.setDeliverableID(deliverableID);        //Set the deliverableID member variable for the Requirement object
         }
         for(int taskID : taskIDVector) {
-            updateDeliverableIDInTaskInDB(deliverableID, taskID);
+            updateAttributeForTableInDB("Task", "DeliverableID", taskID, deliverableID);
             task = getTask(taskID);
             task.setDeliverableID(deliverableID);
         }
 
-        addDeliverableToVector(deliverableID, name, description, dueDate);
+        deliverable = new Deliverable(deliverableID, name, description, dueDate);
+        deliverableVector.add(deliverable);
         //Todo: Navigate back to Deliverable sheet
     }
 
@@ -109,10 +156,9 @@ public class Project {
             }
         }
 
-        deleteDeliverableFromDB(deliverable.getDeliverableID());
+        deleteRecordFromTableInDB("Deliverable", "DeliverableID", deliverable.getDeliverableID());
         deliverableVector.remove(deliverable);      //Delete Deliverable from project
     }
-
 
     //Returns the Deliverable obj if it exists or null if not
     public Deliverable getDeliverable(int deliverableID) {
@@ -141,12 +187,6 @@ public class Project {
         Connect.closeConnection(conn);
     }
 
-    //Called when createDeliverableButtonClicked() is called
-    public void addDeliverableToVector(int deliverableID, String name, String description, Date dueDate) {
-        Deliverable del = new Deliverable(deliverableID, name, description, dueDate);
-        deliverableVector.add(del);
-    }
-
     //Checks to see if the Requirements & Tasks associated with the Deliverable have changed & Adds or Removes them if needed
     public void updateRequirementAndTaskAssociations(Deliverable deliverable, Vector<Integer> requirementIDVector, Vector<Integer> taskIDVector) {
         
@@ -156,13 +196,13 @@ public class Project {
         // If a requirement of task has been deleted, clear the DeliverableID attribute in the DB & project
         for (Integer requirementID : savedRequirementIDsVector) {
             if (!requirementIDVector.contains(requirementID)) {
-                removeDeliverableIDFromRequirementInDB(requirementID);  //Remove the DeliverableID from the requirement in the database
+                updateAttributeForTableInDB("Requirement", "DeliverableID", requirementID, 0); //Remove the DeliverableID from the requirement in the database
                 getRequirement(requirementID).setDeliverableID(0);      //Remove the deliverableID from the requirement obj in the project
             }
         }
         for (Integer taskID : savedTaskIDsVector) {
             if (!requirementIDVector.contains(taskID)) {
-                removeDeliverableIDFromTaskInDB(taskID);
+                updateAttributeForTableInDB("Task", "DeliverableID", taskID, 0);
                 getTask(taskID).setDeliverableID(0);
             }
         }
@@ -170,48 +210,16 @@ public class Project {
         //If a Requirement or Task has been added, add the deliverableID to their DeliverableID attribute in DB & project
         for (Integer requirementID : requirementIDVector) {
             if (!savedRequirementIDsVector.contains(requirementID)) {    //If the requirementVector in the Deliverable does not contain the requirementID
-                updateDeliverableIDInRequirementInDB(deliverable.getDeliverableID(), requirementID);
+                updateAttributeForTableInDB("Requirement", "DeliverableID", requirementID, deliverable.getDeliverableID());
                 getRequirement(requirementID).setDeliverableID(deliverable.getDeliverableID());
             }
         }
         for (Integer taskID : taskIDVector) {
             if (!savedTaskIDsVector.contains(taskID)) {    //If the requirementVector in the Deliverable does not contain the requirementID
-                updateDeliverableIDInTaskInDB(deliverable.getDeliverableID(), taskID);
+                updateAttributeForTableInDB("Task", "DeliverableID", taskID, deliverable.getDeliverableID());
                 getTask(taskID).setDeliverableID(deliverable.getDeliverableID());
             }
         }
-    }
-
-    //Adds the DeliverableID to the Requirement in the project database
-    public void updateDeliverableIDInRequirementInDB(int deliverableID, int requirementID) {
-        String sql = "UPDATE Requirement SET DeliverableID = ? WHERE RequirementID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-
-        try{
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, deliverableID);
-            pstmt.setInt(2, requirementID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-    }
-
-    //Adds the DeliverableID to the Task in the project database
-    public void updateDeliverableIDInTaskInDB(int deliverableID, int taskID) {
-        String sql = "UPDATE Task SET DeliverableID = ? WHERE TaskID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-
-        try{
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, deliverableID);
-            pstmt.setInt(2, taskID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
     }
 
     public Vector<Integer> getAllRequirementIDsAssociatedWithThisDeliverable(int deliverableID) {
@@ -232,37 +240,6 @@ public class Project {
             }
         }
         return taskIDsVector;
-    }
-    
-
-    //Sets the DeliverableID attribute to NULL for the Requirement
-    public void removeDeliverableIDFromRequirementInDB(int requirementID) {
-        String sql = "UPDATE Requirement SET DeliverableID = NULL WHERE RequirementID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, requirementID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-    }
-
-    //Sets the DeliverableID attribute to NULL for the Task
-    public void removeDeliverableIDFromTaskInDB(int taskID) {
-        String sql = "UPDATE Task SET DeliverableID = NULL WHERE TaskID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, taskID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
     }
 
     //Updates the Deliverable object in the Projects deliverableVector
@@ -315,19 +292,6 @@ public class Project {
         }
         Connect.closeConnection(conn);
     }
-
-    public void deleteDeliverableFromDB(int deliverableID) {
-        String sql = "DELETE FROM Deliverable WHERE DeliverableID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, deliverableID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-    }
     
     /*********************************************** TASK *************************************************************/
 
@@ -347,7 +311,8 @@ public class Project {
                                         Date actualEndDate, long actualDuration, int effortCompleted, int actualEffort,
                                         int percentComplete, int type, int resourceID, Vector<Integer> issueIDVector,
                                         Map<Integer, Integer> dependentTasksMap) {
-        int dependency = 0;
+
+        checkForDateDiscrepancies(expectedStartDate, actualStartDate, expectedEndDate, actualEndDate, dependentTasksMap);
 
         //Insert a new record into the DB (in the Task table) & in the project
         insertTaskInDB(name, description, expectedStartDate, expectedEndDate, expectedDuration,
@@ -360,20 +325,7 @@ public class Project {
         taskVector.add(task);       //Add the newly created Deliverable to the Project's deliverableVector
 
         //Create Issue & Dependent Task associations
-        //For every Issue associated with the task add a record into the DB & project
-        for(int issueID : issueIDVector) {
-            insertIssueAffectingTaskInDB(issueID, taskID);
-            IssueAffectingTask iat = new IssueAffectingTask(issueID, taskID);
-            issueAffectingTaskVector.add(iat);      //Add Issue Affecting Task to project
-        }
-        //For every Task that this Task is Dependent on, add a record into the DB & project
-        Set<Integer> dependentTaskIDs = dependentTasksMap.keySet();     //Get the taskID's for all the dependent tasks being associated
-        for (int dependentTaskID : dependentTaskIDs) {
-            dependency = dependentTasksMap.get(dependentTaskID);
-            insertDependentInDB(taskID, dependentTaskID, dependency);
-            Dependent dependent = new Dependent(taskID, dependentTaskID, dependency);
-            dependentVector.add(dependent);
-        }
+        createIssueAndTaskAssociations(taskID, issueIDVector, dependentTasksMap);
 
         //Todo: Navigate back to Task sheet
     }
@@ -384,7 +336,10 @@ public class Project {
                                         int percentComplete, int type, int deliverableID, int resourceID,
                                         Vector<Integer> issueIDVector, Map<Integer, Integer> dependentTasksMap) {
 
-        checkIssueAndTaskLists(task, issueIDVector, dependentTasksMap); //Checks to see is any Issue or Task associations have been added, deleted or changed
+        //Todo: If expected/actual start/end date have changed, change successor tasks depending on association.
+
+        //Checks to see is any Issue or Task associations have been added, deleted or changed
+        checkForChangedIssueOrTaskAssociations(task, issueIDVector, dependentTasksMap);
 
         updateTaskInVector(task, name, description, expectedStartDate, expectedEndDate, expectedDuration,
                 expectedEffort, actualStartDate, actualEndDate, actualDuration, effortCompleted, actualEffort,
@@ -398,13 +353,110 @@ public class Project {
         Vector<Integer> issueIDsVector = getAllIssueIDsAssociatedWithThisTask(taskID);
         Map<Integer, Integer> dependentTasksMap = getAllDependenciesAssociatedWithThisTask(taskID);
         //Remove all associations
-        checkIssueAndTaskLists(task, issueIDsVector, dependentTasksMap);
+        checkForChangedIssueOrTaskAssociations(task, issueIDsVector, dependentTasksMap);
 
         //Delete task in DB & project
-        deleteTaskFromDB(taskID);
+        deleteRecordFromTableInDB("Task", "TaskID", taskID);
         taskVector.remove(task);
 
         //Todo: Return to Task sheet
+    }
+
+    public void checkForDateDiscrepancies(Date expectedStartDate, Date actualStartDate, Date expectedEndDate,
+                                          Date actualEndDate, Map<Integer, Integer> dependentTasksMap) {
+
+        //Make sure that there are no date discrepancies between dependent tasks:
+        Set<Integer> keySet = dependentTasksMap.keySet();
+        for(Integer key : keySet) {
+            switch(key) {
+                case 0: //Finish to Start Dependency: Check that expected/actual start date of successor is after expected/actual date of Predecessor Task
+                    if(expectedStartDate.before(getTask(key).getExpectedEndDate())) {
+                        System.out.println("Expected Start Date for Successor Task CANNOT be before the Expected End Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: " + key + ")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(expectedStartDate.before(getTask(key).getActualEndDate())) {
+                        System.out.println("Expected Start Date for Successor Task CANNOT be before the Actual End Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualStartDate.before(getTask(key).getExpectedEndDate())) {
+                        System.out.println("Actual Start Date for Successor Task CANNOT be before the Expected End Date of a Predecessor Task if Dependency Type is Finish To Start");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualStartDate.before(getTask(key).getActualEndDate())) {
+                        System.out.println("Actual Start Date for Successor Task CANNOT be before the Actual End Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    break;
+                case 1: //Start to Start Dependency: Check that actual/expected start date of successor task is after actual/expected start date of predecessor task
+                    if(expectedStartDate.before(getTask(key).getActualStartDate())) {
+                        System.out.println("Expected Start Date for Successor Task CANNOT be before the Actual End Date of a Predecessor Task if Dependency Type is Start To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(expectedStartDate.before(getTask(key).getExpectedStartDate())) {
+                        System.out.println("Expected Start Date for Successor Task CANNOT be before the Expected End Date of a Predecessor Task if Dependency Type is Start To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualStartDate.before(getTask(key).getActualStartDate())) {
+                        System.out.println("Actual Start Date for Successor Task CANNOT be before the Actual End Date of a Predecessor Task if Dependency Type is Start To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    break;
+                case 2: //Start to Finish Dependency: Check that actual/expected End Date of successor task is after actual/expected start date of predecessor task
+                    if(expectedEndDate.before(getTask(key).getExpectedStartDate())) {
+                        System.out.println("Expected End Date for Successor Task CANNOT be before the Expected Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(expectedEndDate.before(getTask(key).getActualStartDate())) {
+                        System.out.println("Expected End Date for Successor Task CANNOT be before the Actual Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualEndDate.before(getTask(key).getExpectedStartDate())) {
+                        System.out.println("Actual End Date for Successor Task CANNOT be before the Expected Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualEndDate.before(getTask(key).getActualStartDate())) {
+                        System.out.println("Actual End Date for Successor Task CANNOT be before the Actual Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    break;
+                case 3: //Finish to Finish Dependency: Check that actual/expected End Date of successor task is after actual/expected End Date of predecessor task
+                    if(expectedEndDate.before(getTask(key).getExpectedEndDate())) {
+                        System.out.println("Expected End Date for Successor Task CANNOT be before the Expected Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualEndDate.before(getTask(key).getExpectedEndDate())) {
+                        System.out.println("Expected End Date for Successor Task CANNOT be before the Actual Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(expectedEndDate.before(getTask(key).getActualEndDate())) {
+                        System.out.println("Actual End Date for Successor Task CANNOT be before the Expected Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    else if(actualEndDate.before(getTask(key).getActualEndDate())) {
+                        System.out.println("Actual End Date for Successor Task CANNOT be before the Actual Start Date of a Predecessor Task if Dependency Type is Finish To Start (TaskID: \" + key + \")");    //Todo: Change to pop-out
+                        dependentTasksMap.remove(key);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void createIssueAndTaskAssociations(int taskID, Vector<Integer> issueIDVector, Map<Integer, Integer> dependentTasksMap) {
+        //For every Issue associated with the task add a record into the DB & project
+        for(int issueID : issueIDVector) {
+            insertIssueAffectingTaskInDB(issueID, taskID);
+            IssueAffectingTask iat = new IssueAffectingTask(issueID, taskID);
+            issueAffectingTaskVector.add(iat);      //Add Issue Affecting Task to project
+        }
+        //For every Task that this Task is Dependent on, add a record into the DB & project
+        Set<Integer> dependentTaskIDs = dependentTasksMap.keySet();     //Get the taskID's for all the dependent tasks being associated
+        for (int dependentTaskID : dependentTaskIDs) {
+            insertDependentInDB(taskID, dependentTaskID, dependentTasksMap.get(dependentTaskID));
+            Dependent dependent = new Dependent(taskID, dependentTaskID, dependentTasksMap.get(dependentTaskID));
+            dependentVector.add(dependent);
+        }
     }
 
     public void insertTaskInDB(String name, String description, Date expectedStartDate,
@@ -477,7 +529,8 @@ public class Project {
         Connect.closeConnection(conn);
     }
 
-    public void checkIssueAndTaskLists(Task task, Vector<Integer> issueIDVector, Map<Integer, Integer> dependentTasksMap) {
+
+    public void checkForChangedIssueOrTaskAssociations(Task task, Vector<Integer> issueIDVector, Map<Integer, Integer> dependentTasksMap) {
         Vector<Integer> savedIssuesAssociatedVector = getAllIssueIDsAssociatedWithThisTask(task.getTaskID());
         Map<Integer, Integer> savedDependentTasksMap = getAllDependenciesAssociatedWithThisTask(task.getTaskID());
         int taskID = task.getTaskID();
@@ -534,13 +587,11 @@ public class Project {
 
     public Map<Integer, Integer> getAllDependenciesAssociatedWithThisTask(int taskID) {
         Map<Integer, Integer> tasksMap = new HashMap<>();
-
         for(Dependent dependent : dependentVector) {
             if(dependent.getSuccessorID() == taskID) {
                 tasksMap.put(dependent.getPredecessorID(), dependent.getDependency());
             }
         }
-
         return tasksMap;
     }
 
@@ -597,20 +648,55 @@ public class Project {
 
     }
 
-    public void deleteTaskFromDB(int taskID) {
-        String sql = "DELETE FROM Task WHERE TaskID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, taskID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
+    /*********************************************** ISSUE ************************************************************/
+    public void createIssueButtonClicked(int priority, int severity, int status, String name, String description,
+                                         String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
+                                         Date updateDate, Vector<Integer> actionItemIDsVector, Vector<Integer> decisionIDsVector) {
+
+        int issueID;
+        insertIssueInDB(priority, severity, status, name, description, statusDescription, dateRaised, dateAssigned, expectedCompletionDate,
+                actualCompletionDate, updateDate);
+
+        issueID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(getUrl()), "Issue", "IssueID");
+        Issue issue = new Issue(issueID, priority, severity, status, name, description, statusDescription, dateRaised,
+                dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate);
+        issueVector.add(issue);
+
+        updateActionItemAndDecisionAssociations(issue, actionItemIDsVector, decisionIDsVector);
     }
 
-    /*********************************************** ISSUE ************************************************************/
+    public void updateIssueButtonClicked(Issue issue, int priority, int severity, int status, String name,
+                                         String description, String statusDescription, Date dateRaised,
+                                         Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
+                                         Date updateDate, Vector<Integer> actionItemIDsVector,
+                                         Vector<Integer> decisionIDsVector) {
+
+        updateIssueInDB(issue.getIssueID(), priority, severity, status, name, description, statusDescription,
+                dateRaised, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate);
+
+        updateActionItemAndDecisionAssociations(issue, actionItemIDsVector, decisionIDsVector);
+
+        issue.updateIssue(priority, severity, status, name, description, statusDescription, dateRaised, dateAssigned,
+                expectedCompletionDate, actualCompletionDate, updateDate);
+    }
+
+    public void deleteIssueButtonClicked(Issue issue) {
+        //Delete associations
+        Vector<Integer> requirementIDsVector = new Vector<>();
+        Vector<Integer> decisionIDsVector = new Vector<>();
+        updateActionItemAndDecisionAssociations(issue, requirementIDsVector, decisionIDsVector);    //Delete Action Item & Decision associations
+        //Delete Task associations
+        for(IssueAffectingTask iat : issueAffectingTaskVector) {
+            if(iat.getIssueID() == issue.getIssueID()) {
+                deleteIssueAffectingTaskInDB(iat.getTaskID(), iat.getIssueID());    //Delete from DB
+                issueAffectingTaskVector.remove(iat);                               //Delete from project
+            }
+        }
+
+        deleteRecordFromTableInDB("Issue", "IssueID", issue.getIssueID());      //Delete from DB
+        issueVector.remove(issue);      //Delete from project
+    }
+
     public Issue getIssue(int issueID) {
         Issue ret = null;
         for (Issue issue : issueVector) {
@@ -621,41 +707,6 @@ public class Project {
         return ret;
     }
 
-    public void createIssueButtonClicked(int priority, int severity, int status, String name, String description,
-                                         String statusDescription, String priorityDefaults, String severityDefaults, String statusDefaults,
-                                         Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
-                                         Date updateDate, Vector<Integer> actionItemIDsVector, Vector<Integer> decisionIDsVector) {
-
-        int issueID;
-        insertIssueInDB(priority, severity, status, name, description, statusDescription,
-                priorityDefaults, severityDefaults, statusDefaults, dateRaised, dateAssigned, expectedCompletionDate,
-                actualCompletionDate, updateDate);
-
-        issueID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(getUrl()), "Issue", "IssueID");
-        Issue issue = new Issue(issueID, priority, severity, status, name, description, statusDescription,
-                priorityDefaults, severityDefaults, statusDefaults, dateRaised, dateAssigned, expectedCompletionDate,
-                actualCompletionDate, updateDate);
-        issueVector.add(issue);
-
-        updateActionItemAndDecisionAssociations(issue, actionItemIDsVector, decisionIDsVector);
-    }
-
-    public void updateIssueButtonClicked(Issue issue, int priority, int severity, int status, String name, String description,
-                                         String statusDescription, String priorityDefaults, String severityDefaults, String statusDefaults,
-                                         Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
-                                         Date updateDate, Vector<Integer> actionItemIDsVector, Vector<Integer> decisionIDsVector) {
-
-        updateIssueInDB(issue.getIssueID(), priority, severity, status, name, description, statusDescription,
-                priorityDefaults, severityDefaults, statusDefaults, dateRaised, dateAssigned, expectedCompletionDate,
-                actualCompletionDate, updateDate);
-
-        updateActionItemAndDecisionAssociations(issue, actionItemIDsVector, decisionIDsVector);
-
-        issue.updateIssue(priority, severity, status, name, description, statusDescription,
-                priorityDefaults, severityDefaults, statusDefaults, dateRaised, dateAssigned, expectedCompletionDate,
-                actualCompletionDate, updateDate);
-    }
-
     public void updateActionItemAndDecisionAssociations(Issue issue, Vector<Integer> actionItemIDsVector, Vector<Integer> decisionIDsVector) {
         Vector<Integer> savedActionItemIDsVector = getAllActionItemsAssociatedWithThisIssue(issue.getIssueID());
         Vector<Integer> savedDecisionIDsVector = getAllDecisionsAssociatedWithThisIssue(issue.getIssueID());
@@ -663,13 +714,13 @@ public class Project {
         //Check for ADDED Action Items or Decisions associations
         for(Integer actionItemID : actionItemIDsVector) {
             if(!savedActionItemIDsVector.contains(actionItemID)) {
-                addIssueIDToActionItemInDB(issue.getIssueID(), actionItemID);
+                updateAttributeForTableInDB("Action_Item", "IssueID", actionItemID, issue.getIssueID());
                 getActionItem(actionItemID).setIssueID(issue.getIssueID());
             }
         }
         for(Integer decisionID : decisionIDsVector) {
             if(!savedDecisionIDsVector.contains(decisionID)) {
-                addIssueIDToDecisionInDB(issue.getIssueID(), decisionID);
+                updateAttributeForTableInDB("Decision", "IssueID", decisionID, issue.getIssueID());
                 getDecision(decisionID).setIssueID(issue.getIssueID());
             }
         }
@@ -677,70 +728,16 @@ public class Project {
         //Check for DELETED Action Items or Decisions associations
         for(Integer actionItemID : savedActionItemIDsVector) {
             if(!actionItemIDsVector.contains(actionItemID)) {
-                deleteIssueIDFromActionItemInDB(actionItemID);
+                updateAttributeForTableInDB("Action_Item", "IssueID", actionItemID, 0); //Remove association
                 getActionItem(actionItemID).setIssueID(0);
             }
         }
         for(Integer decisionID : savedDecisionIDsVector) {
             if(!decisionIDsVector.contains(decisionID)) {
-                deleteIssueIDFromDecisionInDB(decisionID);
+                updateAttributeForTableInDB("Decision", "IssueID", decisionID, 0); //Remove association
                 getDecision(decisionID).setIssueID(0);
             }
         }
-    }
-
-    public void deleteIssueIDFromDecisionInDB(int decisionID) {
-        String sql = "UPDATE Decision SET IssueID = 0 WHERE DecisionID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, decisionID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-    }
-
-    public void deleteIssueIDFromActionItemInDB(int actionItemID) {
-        String sql = "UPDATE Action_Item SET IssueID = 0 WHERE ActionItemID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, actionItemID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-    }
-
-    public void addIssueIDToDecisionInDB(int issueID, int decisionID) {
-        String sql = "UPDATE Decision SET IssueID = ? WHERE DecisionID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, issueID);
-            pstmt.setInt(2, decisionID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
-    }
-
-    public void addIssueIDToActionItemInDB(int issueID, int actionItemID) {
-        String sql = "UPDATE Action_Item SET IssueID = ? WHERE ActionItemID = ?";
-        Connection conn = Connect.getConnectionToDB(getUrl());
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, issueID);
-            pstmt.setInt(2, actionItemID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
-        }
-        Connect.closeConnection(conn);
     }
 
     public Vector<Integer> getAllActionItemsAssociatedWithThisIssue(int issueID) {
@@ -764,13 +761,12 @@ public class Project {
     }
 
     public void insertIssueInDB(int priority, int severity, int status, String name, String description,
-                                String statusDescription, String priorityDefaults, String severityDefaults, String statusDefaults,
-                                Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
+                                String statusDescription, Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
                                 Date updateDate) {
 
         String sql = "INSERT INTO Issue(Name, Description, Priority, Severity, Date_Raised, Date_Assigned, " +
-                "Expected_Completion_Date, Actual_Completion_Date, Status, Status_Description, Update_Date, " +
-                "Priority_Defaults, Severity_Defaults, status_Defaults) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "Expected_Completion_Date, Actual_Completion_Date, Status, Status_Description, Update_Date) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = Connect.getConnectionToDB(getUrl());
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -785,9 +781,6 @@ public class Project {
             pstmt.setInt(9, status);
             pstmt.setString(10, statusDescription);
             pstmt.setLong(11, User.convertDateToLong(updateDate));
-            pstmt.setString(12, priorityDefaults);
-            pstmt.setString(13, severityDefaults);
-            pstmt.setString(14, statusDefaults);
             pstmt.executeUpdate();
         } catch(SQLException e) {
             System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
@@ -796,14 +789,12 @@ public class Project {
     }
 
     public void updateIssueInDB(int issueID, int priority, int severity, int status, String name, String description,
-                                String statusDescription, String priorityDefaults, String severityDefaults, String statusDefaults,
-                                Date dateRaised, Date dateAssigned, Date expectedCompletionDate, Date actualCompletionDate,
-                                Date updateDate) {
+                                String statusDescription, Date dateRaised, Date dateAssigned,
+                                Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
 
         String sql = "UPDATE Issue SET Name = ?, Description = ?, Priority = ?, Severity = ?, Date_Raised = ?, " +
                 "Date_Assigned = ?, Expected_Completion_Date = ?, Actual_Completion_Date = ?, Status = ?, " +
-                "Status_Description = ?, Update_Date = ?, Priority_Defaults = ?, Severity_Defaults = ?, " +
-                "status_Defaults = ? WHERE IssueID = ?";
+                "Status_Description = ?, Update_Date = ? WHERE IssueID = ?";
         Connection conn = Connect.getConnectionToDB(getUrl());
 
         try {
@@ -819,9 +810,6 @@ public class Project {
             pstmt.setInt(9, status);
             pstmt.setString(10, statusDescription);
             pstmt.setLong(11, User.convertDateToLong(updateDate));
-            pstmt.setString(12, priorityDefaults);
-            pstmt.setString(13, severityDefaults);
-            pstmt.setString(14, statusDefaults);
             pstmt.setInt(15, issueID);
             pstmt.executeUpdate();
         } catch(SQLException e) {
@@ -830,32 +818,37 @@ public class Project {
         Connect.closeConnection(conn);
     }
 
-    public void deleteIssueButtonClicked(Issue issue) {
-        //Delete associations
-        Vector<Integer> requirementIDsVector = new Vector<>();
-        Vector<Integer> decisionIDsVector = new Vector<>();
-        updateActionItemAndDecisionAssociations(issue, requirementIDsVector, decisionIDsVector);    //Delete Action Item & Decision associations
-        //Todo: Delete Task associations
-
-        deleteIssueFromDB(issue.getIssueID());      //Delete from DB
-        issueVector.remove(issue);      //Delete from project
-    }
-
-    public void deleteIssueFromDB(int issueID) {
-        String sql = "DELETE FROM Issue WHERE IssueID = ?";
+    public void loadAllIssuesFromDB() {
+        String sql1 = "SELECT * FROM Issue";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Issue issue;          //Used for the individual Deliverable object before it is added to the deliverables vector
         Connection conn = Connect.getConnectionToDB(getUrl());
+
         try {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, issueID);
-            pstmt.executeUpdate();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql1);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                issue = new Issue();
+                issue.setIssueID(rs.getInt("IssueID"));
+                issue.setName(rs.getString("Name"));
+                issue.setDescription(rs.getString("Description"));
+                issue.setPriority(rs.getInt("Priority"));
+                issue.setSeverity(rs.getInt("Severity"));
+                issue.setDateRaised(User.convertLongToDate(rs.getLong("Date_Raised")));
+                issue.setDateAssigned(User.convertLongToDate(rs.getLong("Date_Assigned")));
+                issue.setExpectedCompletionDate(User.convertLongToDate(rs.getLong("Expected_Completion_Date")));
+                issue.setActualCompletionDate(User.convertLongToDate(rs.getLong("Actual_Completion_Date")));
+                issue.setStatus(rs.getInt("Status"));
+                issue.setStatusDescription(rs.getString("Status_Description"));
+                issue.setUpdateDate(User.convertLongToDate(rs.getLong("Update_Date")));
+                issueVector.add(issue);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
         }
         Connect.closeConnection(conn);
-    }
-
-    public void loadAllIssuesFromDB() {
-        //Todo
     }
 
     /********************************************* ACTION ITEM ********************************************************/
@@ -868,9 +861,144 @@ public class Project {
         }
         return ret;
     }
+
+    public void createActionItemButtonClicked(int resourceID, int status, String name, String description,
+                                              String statusDescription, String statusDefaults, Date dateCreated,
+                                              Date dateAssigned, Date expectedCompletionDate,
+                                              Date actualCompletionDate, Date updateDate) {
+        //Insert in DB
+        insertActionItemInDB(resourceID, status, name, description, statusDescription, dateCreated, dateAssigned,
+                expectedCompletionDate, actualCompletionDate, updateDate);
+        int actionItemID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(getUrl()), "Action_Item", "ActionItemID");
+        //Insert in Project
+        ActionItem actionItem = new ActionItem(actionItemID, 0, 0, resourceID, status, name, description,
+                statusDescription, dateCreated, dateAssigned, expectedCompletionDate,
+                actualCompletionDate, updateDate);
+        actionItemVector.add(actionItem);
+    }
+
+    public void updateActionItemButtonClicked(ActionItem actionItem, int resourceID, int status, String name, String description,
+                                              String statusDescription, String statusDefaults, Date dateCreated,
+                                              Date dateAssigned, Date expectedCompletionDate,
+                                              Date actualCompletionDate, Date updateDate) {
+
+        updateActionItemInDB(actionItem.getActionItemID(), resourceID, status, name, description, statusDescription,
+                dateCreated, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate);
+
+        updateActionItemInProject(actionItem, resourceID, status, name, description, statusDescription,
+                dateCreated, dateAssigned, expectedCompletionDate, actualCompletionDate, updateDate);
+    }
+
+    public void deleteActionItemButtonClicked(ActionItem actionItem) {
+        //Delete from DB
+        deleteRecordFromTableInDB("Action_Item", "ActionItemID", actionItem.getActionItemID());
+        //Delete from project
+        actionItemVector.remove(actionItem);
+    }
+
+    public void insertActionItemInDB(int resourceID, int status, String name, String description,
+                                     String statusDescription, java.util.Date dateCreated,
+                                     java.util.Date dateAssigned, java.util.Date expectedCompletionDate,
+                                     java.util.Date actualCompletionDate, java.util.Date updateDate) {
+
+        String sql = "INSERT INTO Action_Item(IssueID, RiskID, ResourceID, Name, Description, Date_Created, Date_Assigned, " +
+                "Expected_Completion_Date, Actual_Completion_Date, Status, Status_Description, Update_Date) " +
+                "VALUES(0, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, resourceID);
+            pstmt.setString(2, name);
+            pstmt.setString(3, description);
+            pstmt.setLong(4, User.convertDateToLong(dateCreated));
+            pstmt.setLong(5, User.convertDateToLong(dateAssigned));
+            pstmt.setLong(6, User.convertDateToLong(expectedCompletionDate));
+            pstmt.setLong(7, User.convertDateToLong(actualCompletionDate));
+            pstmt.setInt(8, status);
+            pstmt.setString(9, statusDescription);
+            pstmt.setLong(10, User.convertDateToLong(updateDate));
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
     
     public void loadAllActionItemsFromDB() {
+        String sql1 = "SELECT * FROM Action_Item";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        ActionItem actionItem;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql1);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                actionItem = new ActionItem();
+                actionItem.setActionItemID(rs.getInt("ActionItemID"));
+                actionItem.setIssueID(rs.getInt("IssueID"));
+                actionItem.setRiskID(rs.getInt("RiskID"));
+                actionItem.setResourceID(rs.getInt("ResourceID"));
+                actionItem.setName(rs.getString("Name"));
+                actionItem.setDescription(rs.getString("Description"));
+                actionItem.setDateCreated(User.convertLongToDate(rs.getLong("Date_Created")));
+                actionItem.setDateAssigned(User.convertLongToDate(rs.getLong("Date_Assigned")));
+                actionItem.setExpectedCompletionDate(User.convertLongToDate(rs.getLong("Expected_Completion_Date")));
+                actionItem.setActualCompletionDate(User.convertLongToDate(rs.getLong("Actual_Completion_Date")));
+                actionItem.setStatus(rs.getInt("Status"));
+                actionItem.setStatusDescription(rs.getString("Status_Description"));
+                actionItem.setUpdateDate(User.convertLongToDate(rs.getLong("Update_Date")));
+                actionItemVector.add(actionItem);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
+    public void updateActionItemInProject(ActionItem actionItem, int resourceID, int status, String name, String description,
+                                          String statusDescription, Date dateCreated,
+                                          Date dateAssigned, Date expectedCompletionDate,
+                                          Date actualCompletionDate, Date updateDate) {
+        actionItem.setResourceID(resourceID);
+        actionItem.setStatus(status);
+        actionItem.setName(name);
+        actionItem.setDescription(description);
+        actionItem.setStatusDescription(statusDescription);
+        actionItem.setDateCreated(dateCreated);
+        actionItem.setDateAssigned(dateAssigned);
+        actionItem.setExpectedCompletionDate(expectedCompletionDate);
+        actionItem.setActualCompletionDate(actualCompletionDate);
+        actionItem.setUpdateDate(updateDate);
+    }
+
+    public void updateActionItemInDB(int actionItemID, int resourceID, int status, String name, String description,
+                                     String statusDescription, Date dateCreated, Date dateAssigned,
+                                     Date expectedCompletionDate, Date actualCompletionDate, Date updateDate) {
+
+        String sql = "UPDATE Action_Item SET ResourceID = ?, Name = ?, Description = ?, Date_Created = ?, Date_Assigned = ?, " +
+                "Expected_Completion_Date = ?, Actual_Completion_Date = ?, Status = ?, Status_Description = ?, Update_Date = ? WHERE = ?";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, resourceID);
+            pstmt.setString(2, name);
+            pstmt.setString(3, description);
+            pstmt.setLong(4, User.convertDateToLong(dateCreated));
+            pstmt.setLong(5, User.convertDateToLong(dateAssigned));
+            pstmt.setLong(6, User.convertDateToLong(expectedCompletionDate));
+            pstmt.setLong(7, User.convertDateToLong(actualCompletionDate));
+            pstmt.setInt(8, status);
+            pstmt.setString(9, statusDescription);
+            pstmt.setLong(10, User.convertDateToLong(updateDate));
+            pstmt.setInt(11, actionItemID);
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /********************************************* RESOURCE ********************************************************/
@@ -884,8 +1012,119 @@ public class Project {
         return ret;
     }
 
-    public void loadAllResourcesFromDB() {
+    public void createResourceButtonClicked(String name, String title, String availability, float payRate) {
+        insertResourceInDB(name, title, availability, payRate);
+        int resourceID = Connect.getNewestIDFromTable(Connect.getConnectionToDB(getUrl()), "Resource", "ResourceID");
+        Resource resource = new Resource(resourceID, name, title, availability, payRate);
+        resourceVector.add(resource);
+    }
 
+    public void updateResourceButtonClicked(Resource resource, String name, String title, String availability, float payRate) {
+        updateResourceInDB(resource.getResourceID(), name, title, availability, payRate);
+        updateResourceInProject(resource, name, title, availability, payRate);
+    }
+
+    public void insertResourceInDB(String name, String title, String availability, float payRate) {
+        String sql = "INSERT INTO Resource(Name, Title, Availability_Calendar, Pay_Rate) VALUES(?, ?, ?, ?)";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            pstmt.setString(2, title);
+            pstmt.setString(3, availability);
+            pstmt.setFloat(4, payRate);
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
+    public void updateResourceInProject(Resource resource, String name, String title, String availability, float payRate) {
+        resource.setName(name);
+        resource.setTitle(title);
+        resource.setAvailability(availability);
+        resource.setPayRate(payRate);
+    }
+
+    public void updateResourceInDB(int resourceID, String name, String title, String availability, float payRate) {
+        String sql = "UPDATE Resource SET Name = ?, Title = ?, Availability_Calendar = ?, Pay_Rate = ? WHERE ResourceID = ?";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            pstmt.setString(2, title);
+            pstmt.setString(3, availability);
+            pstmt.setFloat(4, payRate);
+            pstmt.setInt(5, resourceID);
+            pstmt.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
+    public void deleteResourceButtonClicked(Resource resource) {
+        deleteRecordFromTableInDB("Resource", "ResourceID", resource.getResourceID());
+        deleteResourceAssociations(resource);
+        resourceVector.remove(resource);
+    }
+
+    public void deleteResourceAssociations(Resource resource) {
+        //Delete Task associations (Change ResourceID attribute to 0)
+        for(Task task : taskVector) {
+            if(task.getResourceID() == resource.resourceID) {
+                updateAttributeForTableInDB("Task", "ResourceID", task.getTaskID(), 0);
+                task.setResourceID(0);
+            }
+        }
+        //Delete ResourceSkill associations (Delete ResourceSkill)
+        for(ResourceSkill resourceSkill : resourceSkillVector) {
+            if(resourceSkill.getResourceID() == resource.getResourceID()) {
+                deleteRecordFromTableInDB("Resource_Skill", "ResourceID", resourceSkill.getResourceID());
+                resourceSkill.setResourceID(0);
+            }
+        }
+        //Delete Action Item associations
+        for(ActionItem actionItem : actionItemVector) {
+            if(actionItem.getResourceID() == resource.getResourceID()) {
+                updateAttributeForTableInDB("Action_Item", "ResourceID", actionItem.getActionItemID(), 0);
+                actionItem.setResourceID(0);
+            }
+        }
+        //Delete Decision associations
+        for(Decision decision : decisionVector) {
+            if(decision.getResourceID() == resource.getResourceID()) {
+                updateAttributeForTableInDB("Decision", "ResourceID", decision.getDecisionID(), 0);
+                decision.setResourceID(0);
+            }
+        }
+    }
+
+    public void loadAllResourcesFromDB() {
+        String sql = "SELECT * FROM Resource";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Resource resource;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
+
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                resource = new Resource();
+                resource.setResourceID(rs.getInt("ResourceID"));
+                resource.setName(rs.getString("Name"));
+                resource.setTitle(rs.getString("Title"));
+                resource.setAvailability(rs.getString("Availability_Calendar"));
+                resource.setPayRate(rs.getFloat("Pay_Rate"));
+                resourceVector.add(resource);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /********************************************* REQUIREMENT ********************************************************/
@@ -902,7 +1141,31 @@ public class Project {
     }
 
     public void loadAllRequirementsFromDB() {
+        String sql = "SELECT * FROM Requirement";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Requirement requirement;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                requirement = new Requirement();
+                requirement.setRequirementID(rs.getInt("RequirementID"));
+                requirement.setDeliverableID(rs.getInt("DeliverableID"));
+                requirement.setName(rs.getString("Name"));
+                requirement.setRequirementText(rs.getString("Requirement_Text"));
+                requirement.setSourceDocument(rs.getString("Source_Document"));
+                requirement.setLocationInSourceDocument(rs.getString("Location_In_Source_Document"));
+                requirement.setClientReference(rs.getString("Client_Reference"));
+                requirementVector.add(requirement);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /********************************************* DECISION ********************************************************/
@@ -917,7 +1180,40 @@ public class Project {
     }
 
     public void loadAllDecisionsFromDB() {
+        String sql = "SELECT * FROM Decision";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Decision decision;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                decision = new Decision();
+                decision.setDecisionID(rs.getInt("DecisionID"));
+                decision.setResourceID(rs.getInt("ResourceID"));
+                decision.setIssueID(rs.getInt("IssueID"));
+                decision.setName(rs.getString("Name"));
+                decision.setDescription(rs.getString("Description"));
+                decision.setPriority(rs.getInt("Priority"));
+                decision.setImpact(rs.getInt("Impact"));
+                decision.setDateCreated(User.convertLongToDate(rs.getLong("Date_Created")));
+                decision.setDateNeeded(User.convertLongToDate(rs.getLong("Date_Needed")));
+                decision.setDateMade(User.convertLongToDate(rs.getLong("Date_Made")));
+                decision.setExpectedCompletionDate(User.convertLongToDate(rs.getLong("Expected_Completion_Date")));
+                decision.setActualCompletionDate(User.convertLongToDate(rs.getLong("Actual_Completion_Date")));
+                decision.setNoteDate(User.convertLongToDate(rs.getLong("Note_Date")));
+                decision.setStatus(rs.getInt("Status"));
+                decision.setStatusDescription(rs.getString("Status_Description"));
+                decision.setUpdateDate(User.convertLongToDate(rs.getLong("Update_Date")));
+                decisionVector.add(decision);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /******************************************* REFERENCE DOCUMENT ***************************************************/
@@ -932,7 +1228,24 @@ public class Project {
     }
 
     public void loadAllReferenceDocumentsFromDB() {
+        String sql = "SELECT * FROM Reference_Document";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        ReferenceDocument referenceDocument;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                referenceDocument = new ReferenceDocument(rs.getInt("ReferenceDocumentID"), rs.getInt("DecisionID"), rs.getString("Name"));
+                referenceDocumentVector.add(referenceDocument);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /********************************************* RISK ********************************************************/
@@ -947,7 +1260,33 @@ public class Project {
     }
 
     public void loadAllRisksFromDB() {
+        String sql = "SELECT * FROM Risk";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Risk risk;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                risk = new Risk();
+                risk.setRiskID(rs.getInt("RiskID"));
+                risk.setDeliverableID(rs.getInt("DeliverableID"));
+                risk.setCategory(rs.getInt("Category"));
+                risk.setName(rs.getString("Name"));
+                risk.setProbability(rs.getInt("Probability"));
+                risk.setImpact(rs.getInt("Impact"));
+                risk.setMitigation(rs.getString("Mitigation"));
+                risk.setContingency(rs.getString("Contingency"));
+                risk.setActionBy(User.convertLongToDate(rs.getLong("Action_By")));
+                riskVector.add(risk);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /************************************************* CHANGE *********************************************************/
@@ -962,7 +1301,30 @@ public class Project {
     }
 
     public void loadAllChangesFromDB() {
+        String sql = "SELECT * FROM Change";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Change change;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                change = new Change();
+                change.setChangeID(rs.getInt("ChangeID"));
+                change.setName(rs.getString("Name"));
+                change.setStatus(rs.getInt("Status"));
+                change.setRequestor(rs.getString("Requestor"));
+                change.setDateRequested(User.convertLongToDate(rs.getLong("Date_Requested")));
+                change.setUpdateDate(User.convertLongToDate(rs.getLong("Update_Date")));
+                changeVector.add(change);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /********************************************** DEPENDENT *********************************************************/
@@ -1024,7 +1386,24 @@ public class Project {
     }
 
     public void loadAllDependentsFromDB() {
+        String sql = "SELECT * FROM Dependent";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Dependent dependent;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                dependent = new Dependent(rs.getInt("SuccessorID"), rs.getInt("PredecessorID"), rs.getInt("Dependency"));
+                dependentVector.add(dependent);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
 
@@ -1059,20 +1438,119 @@ public class Project {
 
 
     public void loadAllIssueAffectingTasksFromDB() {
+        String sql = "SELECT * FROM Issue_Affecting_Task";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        IssueAffectingTask issueAffectingTask;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
 
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                issueAffectingTask = new IssueAffectingTask(rs.getInt("IssueID"), rs.getInt("TaskID"));
+                issueAffectingTaskVector.add(issueAffectingTask);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /*********************************************** MEETING NOTE *****************************************************/
 
     public void loadAllMeetingNotesFromDB() {
+        String sql = "SELECT * FROM Meeting_Note";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        MeetingNote meetingNote;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
 
+            //Goes through each row of the table
+            while(rs.next()) {
+                meetingNote = new MeetingNote(rs.getInt("MeetingNoteID"), rs.getInt("DecisionID"), rs.getString("Note"));
+                meetingNoteVector.add(meetingNote);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
     }
 
     /********************************************* RESOURCE SKILL *****************************************************/
 
     public void loadAllResourceSkillsFromDB() {
+        String sql = "SELECT * FROM Decision";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        ResourceSkill resourceSkill;          //Used for the individual Deliverable object before it is added to the deliverables vector
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+
+            //Goes through each row of the table
+            while(rs.next()) {
+                resourceSkill = new ResourceSkill(rs.getInt("ResourceSkillID"), rs.getString("Skill"));
+                resourceSkillVector.add(resourceSkill);
+            }
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
+    /*********************************************** DEFAULTS *********************************************************/
+
+    public void loadAllDefaultsFromDB() {
+        String sql = "SELECT * FROM Defaults";
+        ResultSet rs;                    //ResultSet object is used to hold the results of the sql query
+        Defaults defaults = new Defaults();
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);        //Execute the sql query and return the results to the ResultSet object
+            rs.next();
+            defaults.setPriorityDefaults(rs.getString("Priority_Defaults"));
+            defaults.setSeverityDefaults(rs.getString("Severity_Defaults"));
+            defaults.setStatusDefaults(rs.getString("Status_Defaults"));
+            defaults.setCategoryDefaults(rs.getString("Category_Defaults"));
+            defaults.setImpactDefaults(rs.getString("Impact_Defaults"));
+            this.defaults = defaults;
+
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+    }
+
+    public void insertDefaultValuesInDefaultsTableInDBAndProject() {
+        String sql = "INSERT INTO Defaults(Priority_Defaults, Severity_Defaults, Status_Defaults, Category_Defaults, " +
+                "Impact_Defaults) VALUES(?, ?, ?, ?, ?)";
+        Connection conn = Connect.getConnectionToDB(getUrl());
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "High, Medium, Low");
+            pstmt.setString(2, "Critical, High, Medium, Low, Minor");
+            pstmt.setString(3, "Open, Closed, In Progress, Hold, Complete");
+            pstmt.setString(4, "Schedule, Budget, Scope");
+            pstmt.setString(5, "Critical, High, Medium, Low, Minor");
+            pstmt.executeUpdate();
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());     //Todo: Change to pop-out dialog
+        }
+        Connect.closeConnection(conn);
+
+        defaults.setPriorityDefaults("High, Medium, Low");
+        defaults.setSeverityDefaults("Critical, High, Medium, Low, Minor");
+        defaults.setStatusDefaults("Open, Closed, In Progress, Hold, Complete");
+        defaults.setCategoryDefaults("Schedule, Budget, Scope");
+        defaults.setImpactDefaults("Critical, High, Medium, Low, Minor");
 
     }
+
 
 
 
