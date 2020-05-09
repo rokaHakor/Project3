@@ -1,6 +1,7 @@
 package main.gui;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,8 +14,17 @@ public class ProjectGUI {
     private JButton addDeliverable;
     private JButton addTask;
     private JButton addIssue;
+    private JPanel deliverablesPanel;
 
     public ProjectGUI() {
+        deliverablesPanel.setLayout(new BoxLayout(deliverablesPanel, BoxLayout.Y_AXIS));
+        deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        JButton button = new JButton("Button1");
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deliverablesPanel.add(button);
+        deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+
         addDeliverable.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,12 +73,23 @@ public class ProjectGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFrame resourceForm = new JFrame();
-                resourceForm.setTitle("Deliverable Form");
+                resourceForm.setTitle("Resource Form");
                 resourceForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 resourceForm.setContentPane(new ResourcesForm(resourceForm).panel1);
                 resourceForm.pack();
                 resourceForm.setVisible(true);
             }
         });
+    }
+
+    private void addDeliverables() {
+        for (int x = 1; x <= 10; x++) {
+            deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            JButton button = new JButton("Button" + x);
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            deliverablesPanel.add(button);
+            
+            deliverablesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
     }
 }

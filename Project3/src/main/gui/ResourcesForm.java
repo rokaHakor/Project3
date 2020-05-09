@@ -40,7 +40,7 @@ public class ResourcesForm {
         });
     }
 
-    public ResourcesForm(JFrame frame, String name, String title, String skills, int from, int to, EnumSet<Days> availability, float wage) {
+    public ResourcesForm(JFrame frame, boolean edit, String name, String title, String skills, int from, int to, EnumSet<Days> availability, float wage) {
         mainFrame = frame;
         resourceNameTextField.setText(name);
         titleText.setText(title);
@@ -54,6 +54,21 @@ public class ResourcesForm {
         thursdayCheckBox.setSelected(availability.contains(Days.THURSDAY));
         fridayCheckBox.setSelected(availability.contains(Days.FRIDAY));
 
+        if (!edit) {
+            resourceNameTextField.setEnabled(false);
+            titleText.setEnabled(false);
+            skillsText.setEnabled(false);
+            fromTime.setEnabled(false);
+            toTime.setEnabled(false);
+            wageText.setEnabled(false);
+            mondayCheckBox.setEnabled(false);
+            tuesdayCheckBox.setEnabled(false);
+            wednesdayCheckBox.setEnabled(false);
+            thursdayCheckBox.setEnabled(false);
+            fridayCheckBox.setEnabled(false);
+            saveButton.setText("Edit");
+            cancelButton.setText("Close");
+        }
 
         saveButton.addActionListener(new ActionListener() {
             @Override
@@ -67,5 +82,6 @@ public class ResourcesForm {
                 mainFrame.dispose();
             }
         });
+
     }
 }
