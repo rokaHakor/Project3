@@ -36,7 +36,7 @@ public static Date convertLongToDate(long dateLong)
 */
 
 
-package ssl.pms;
+package main;
 
 import java.sql.*;
 import java.util.Vector;

@@ -1,4 +1,4 @@
-package ssl.pms;
+package main;
 
 public class ReferenceDocument {
 

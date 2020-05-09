@@ -12,7 +12,7 @@
 
  */
 
-package ssl.pms;
+package main;
 
 import java.sql.Connection;
 import java.sql.Statement;
